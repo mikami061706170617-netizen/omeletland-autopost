@@ -1,0 +1,40 @@
+name: daily post
+
+on:
+  schedule:
+    - cron: "0 5 * * *"        # 05:00 UTC = 09:00 トビリシ
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "投稿せずに中身だけ表示する"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: post
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          PAGE_TOKEN: ${{ secrets.PAGE_TOKEN }}
+          IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python3 post.py
+
+      - name: record
+        if: ${{ success() && inputs.dry_run != true }}
+        run: |
+          if [ -n "$(git status --porcelain state.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state.json
+            git commit -m "posted $(date -u +%F)"
+            git push
+          fi

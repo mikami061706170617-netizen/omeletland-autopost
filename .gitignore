@@ -1,3 +1,8 @@
 __pycache__/
 *.pyc
 .DS_Store
+# 素材（巨大・非公開）
+動画/
+_thumbs/
+_reel/
+R1_20seconds_v*.mp4

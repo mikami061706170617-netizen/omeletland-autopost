@@ -2,7 +2,8 @@
   "order": [
     "R1",
     "R3",
-    "R2"
+    "R2",
+    "R4"
   ],
   "posts": {
     "R1": {
@@ -22,6 +23,12 @@
       "title": "Kharcho Omurice — from the pan to the plate",
       "video": "reels/R3_kharcho_omurice.mp4",
       "caption": "Georgian kharcho meets Japanese omurice.\nSlow-cooked beef kharcho, fluffy egg, fresh coriander.\n\nქართული ხარჩო შეხვდა იაპონურ ომურაისს.\nნელ ცეცხლზე მოხარშული ძროხის ხარჩო, ფაფუკი კვერცხი, ახალი ქინძი.\n\nジョージアのハルチョー × 日本のオムライス。\n\nJapan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni St), Saburtalo\n6 min from Technical University metro · Open daily 11:00–23:00\n\n#omurice #tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #saburtalo #japanesefoodtbilisi #georgia #თბილისი #საბურთალო #ომურაისი #オムライス #トビリシ #foodasmr #satisfying #kharcho #ხარჩო"
+    },
+    "R4": {
+      "id": "R4",
+      "title": "Pakaan! — chopsticks open the soft omelette",
+      "video": "reels/R4_omurice.mp4",
+      "caption": "Wait for it… chopsticks open the soft omelette right on the rice.\nEvery omurice cooked to order.\n\nდაელოდე… ფაფუკი ომლეტი ბრინჯზე იხსნება.\nყოველი ომურაისი — შეკვეთისთანავე.\n\n半熟オムレツ、パカーン。一皿ずつ注文が入ってから焼いています。\n\nJapan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni St), Saburtalo\n6 min from Technical University metro · Open daily 11:00–23:00\n\n#omurice #tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #saburtalo #japanesefoodtbilisi #georgia #თბილისი #საბურთალო #ომურაისი #オムライス #トビリシ #foodasmr #satisfying #pakaan #softomelette"
     }
   }
 }

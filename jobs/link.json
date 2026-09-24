@@ -1,5 +1,13 @@
 {
   "url": "https://113.gigafile.nu/0930-86741790143b0be1bfba166efd3d3416",
-  "mode": "preview", "try": 2,
+  "mode": "preview",
+  "try": 3,
+  "sheets": [
+    ["IMG_1067.mov", 360, 400, 1.0],
+    ["IMG_1067.mov", 400, 434, 1.0],
+    ["IMG_1068.mov", 0, 40, 1.0],
+    ["IMG_1068.mov", 44, 84, 1.0],
+    ["IMG_1066.mov", 0, 20, 0.5]
+  ],
   "clips": {}
 }

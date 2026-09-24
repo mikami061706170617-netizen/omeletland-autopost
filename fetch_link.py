@@ -119,6 +119,9 @@ def probe(path):
     return json.loads(out)
 
 
+SHEETS = []
+
+
 def preview(vids):
     os.makedirs(os.path.join(ROOT, "preview"), exist_ok=True)
     info = {}
@@ -138,6 +141,16 @@ def preview(vids):
                       "size_mb": round(os.path.getsize(v) / 1e6, 1),
                       "streams": p.get("streams", [])}
         print(name, info[name]["duration"], "秒 → preview/", os.path.basename(out))
+    # 細かいコマ見本: "sheets": [["IMG_1067.mov", 360, 434, 1.0], ...]
+    by_name = {os.path.basename(v): v for v in vids}
+    for k, (name, t0, t1, st) in enumerate(SHEETS):
+        out = os.path.join(ROOT, "preview", "z%02d_%s_%d-%d.jpg" % (k, os.path.splitext(name)[0], t0, t1))
+        vf = ("fps=1/{s},scale=216:-2,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+              ":text='%{{pts\\:hms}}':x=6:y=6:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.6,"
+              "tile=8x5").format(s=st)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(t0), "-to", str(t1), "-copyts",
+                        "-i", by_name[name], "-vf", vf, "-frames:v", "1", "-q:v", "4", out], check=True)
+        print("細かいコマ見本:", os.path.basename(out))
     with open(os.path.join(ROOT, "preview", "info.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
 
@@ -156,6 +169,7 @@ def main():
     job = json.load(open(os.path.join(ROOT, "jobs", "link.json"), encoding="utf-8"))
     vids = download(job["url"])
     print("動画:", [os.path.basename(v) for v in vids])
+    SHEETS.extend(job.get("sheets", []))
     if job.get("mode", "preview") == "preview":
         preview(vids)
     else:

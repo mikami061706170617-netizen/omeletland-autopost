@@ -62,23 +62,34 @@ def download(url):
     base = "{0.scheme}://{0.netloc}".format(urllib.parse.urlparse(url))
     fid = urllib.parse.urlparse(url).path.strip("/")
 
-    links = []
+    # ページ内のファイルID（例 0930-abcd…）を全部拾う。まとめページなら複数ある
+    ids = []
+    for i in [fid] + re.findall(r"\d{4}-[0-9a-f]{32}", page):
+        if i not in ids:
+            ids.append(i)
+    candidates = []
     for pat in (r"(?:https?://[^\"' ]+)?/dl_zip\.php\?file=[\w\-]+",
                 r"(?:https?://[^\"' ]+)?/download\.php\?file=[\w\-]+"):
         for hit in re.findall(pat, page):
             full = hit if hit.startswith("http") else base + hit
-            if full not in links:
-                links.append(full)
-    # まとめてダウンロード(zip)があればそれだけで足りる
-    zips = [l for l in links if "dl_zip.php" in l]
-    candidates = zips or links or [base + "/download.php?file=" + fid]
+            if full not in candidates:
+                candidates.append(full)
+    for i in ids:
+        for u in (base + "/dl_zip.php?file=" + i, base + "/download.php?file=" + i):
+            if u not in candidates:
+                candidates.append(u)
+    print("ファイルID:", ids)
     print("候補リンク:", candidates)
 
     got = []
     for link in candidates:
-        path, html = save(op, link, url, WORK)
+        try:
+            path, html = save(op, link, url, WORK)
+        except Exception as e:
+            print("失敗:", link, e)
+            continue
         if path is None:
-            print("HTMLが返りました:", link, html[:300].replace("\n", " "))
+            print("HTMLが返りました:", link, html[:200].replace("\n", " "))
             continue
         print("取得:", path, os.path.getsize(path) // 1_000_000, "MB")
         if zipfile.is_zipfile(path):
@@ -86,9 +97,13 @@ def download(url):
                 z.extractall(WORK)
             os.remove(path)
         got.append(path)
+        if "dl_zip.php" in link:
+            break          # まとめzipが取れたら個別は不要
     if not got:
-        print(page[:2000])
-        raise RuntimeError("動画を取得できませんでした（リンクの期限切れか、ページの形式が変わった）")
+        os.makedirs(os.path.join(ROOT, "preview"), exist_ok=True)
+        with open(os.path.join(ROOT, "preview", "_page.html"), "w", encoding="utf-8") as f:
+            f.write(page)
+        raise RuntimeError("動画を取得できませんでした（preview/_page.html にページを保存）")
     vids = []
     for d, _, files in os.walk(WORK):
         for f in files:

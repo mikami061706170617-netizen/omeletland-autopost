@@ -28,6 +28,7 @@ jobs:
         run: python3 fetch_link.py
 
       - name: record
+        if: always()
         run: |
           if [ -n "$(git status --porcelain preview reels reels.json)" ]; then
             git config user.name  "github-actions[bot]"

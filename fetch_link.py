@@ -114,7 +114,7 @@ def download(url):
 
 def probe(path):
     out = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
-                          "format=duration:stream=width,height,codec_name,codec_type",
+                          "format=duration,start_time:stream=width,height,codec_name,codec_type,start_time,r_frame_rate,avg_frame_rate",
                           "-of", "json", path], capture_output=True, text=True, check=True).stdout
     return json.loads(out)
 
@@ -145,11 +145,13 @@ def preview(vids):
     by_name = {os.path.basename(v): v for v in vids}
     for k, (name, t0, t1, st) in enumerate(SHEETS):
         out = os.path.join(ROOT, "preview", "z%02d_%s_%d-%d.jpg" % (k, os.path.splitext(name)[0], t0, t1))
-        vf = ("fps=1/{s},scale=216:-2,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-              ":text='%{{pts\\:hms}}':x=6:y=6:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.6,"
-              "tile=8x5").format(s=st)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(t0), "-to", str(t1), "-copyts",
-                        "-i", by_name[name], "-vf", vf, "-frames:v", "1", "-q:v", "4", out], check=True)
+        # 編集（make_reel の trim）と同じ時間の数え方で切り出す。表示は元動画の秒数
+        vf = ("trim=start={a}:end={b},setpts=PTS-STARTPTS,fps=1/{s},scale=216:-2,"
+              "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+              ":text='%{{pts\\:hms\\:{a}}}':x=6:y=6:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.6,"
+              "tile=8x5").format(a=t0, b=t1, s=st)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", by_name[name], "-vf", vf,
+                        "-frames:v", "1", "-q:v", "4", out], check=True)
         print("細かいコマ見本:", os.path.basename(out))
     with open(os.path.join(ROOT, "preview", "info.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)

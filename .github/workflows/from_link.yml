@@ -30,10 +30,10 @@ jobs:
       - name: record
         if: always()
         run: |
-          if [ -n "$(git status --porcelain preview reels reels.json)" ]; then
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A -f preview reels reels.json
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -f preview reels reels.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
             git commit -m "reel from link $(date -u +%F_%H%M)"
             git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin "HEAD:$GITHUB_REF_NAME"

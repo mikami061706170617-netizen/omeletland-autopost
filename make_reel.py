@@ -43,6 +43,8 @@ FAST = 1.6          # 焼いている前半の早送り倍率
 SLOW = 0.5          # パカーンの瞬間のスロー倍率
 PRE, POST = 0.8, 1.2  # パカーンの前後何秒をスローにするか（元動画の秒）
 MAX_LEN = 58.0      # ストーリーズ（60秒まで）にもそのまま出せる長さ
+TAIL_MAX = 10.0     # パカーンの後に残す長さ（元動画の秒）
+FAST_MAX = 12.0     # 長い動画はここまで早送り（タイムラプス風）
 
 FONTS = [
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",       # Mac
@@ -70,13 +72,17 @@ def timeline(start, end, reveal):
     reveal = min(max(reveal, start), end)
     a0, a1 = start, max(start, reveal - PRE)
     b1 = min(end, reveal + POST)
+    end = min(end, b1 + TAIL_MAX)   # 盛り付け後が長い動画は切る
     c_len = end - b1
     slow_len = (b1 - a1) / SLOW
 
     fast = FAST
     if (a1 - a0) / fast + slow_len + c_len > MAX_LEN and a1 > a0:
         room = MAX_LEN - slow_len - c_len
-        fast = min(4.0, (a1 - a0) / room) if room > 0 else 4.0
+        fast = min(FAST_MAX, (a1 - a0) / room) if room > 0 else FAST_MAX
+    if (a1 - a0) / fast + slow_len + c_len > MAX_LEN:
+        # 12倍でも収まらないほど長い動画は、パカーンに近い後半だけ使う
+        a0 = a1 - (MAX_LEN - slow_len - c_len) * fast
 
     segs = [s for s in [(a0, a1, fast), (a1, b1, SLOW), (b1, end, 1.0)] if s[1] - s[0] > 0.05]
     out_reveal = (a1 - a0) / fast + (reveal - a1) / SLOW

@@ -114,6 +114,10 @@ check("早送り→スロー→等速の3区間", [s[2] for s in segs] == [M.FAS
 check("パカーンの位置がスロー区間の中", abs(rv - (25.2 / M.FAST + 0.8 / M.SLOW)) < 1e-6, "%.2f秒" % rv)
 _, _, long_total = M.timeline(0, 150, 140)
 check("長い動画でも60秒以内に収める", long_total <= M.MAX_LEN + 0.01, "%.1f秒" % long_total)
+_, _, t7 = M.timeline(0, 434, 434 * 0.65)
+check("7分の動画でも60秒以内に収める", t7 <= M.MAX_LEN + 0.01, "%.1f秒" % t7)
+_, _, t20 = M.timeline(0, 1200, 1100)
+check("20分の動画でも60秒以内に収める", t20 <= M.MAX_LEN + 0.01, "%.1f秒" % t20)
 cap = M.caption_for("No.01 Classic Omurice", 25)
 check("自動キャプションが制限内", len(cap) <= 2200 and cap.count("#") <= 30,
       "%d文字 / タグ%d個" % (len(cap), cap.count("#")))

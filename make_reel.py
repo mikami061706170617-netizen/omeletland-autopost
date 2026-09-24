@@ -360,15 +360,18 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
 
 
 def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=None,
-                   place="JAPAN FOOD HUB · SABURTALO"):
+                   place="JAPAN FOOD HUB · SABURTALO", music="default", wide=False, max_len=90):
     """複数の動画から区間をつなげて1本のリールにする。
 
     segments: [(元動画のパス, 開始秒, 終了秒, 速度), ...]  速度 2.0 = 2倍速、0.5 = スロー
     reveal_index: この区間の頭で白フラッシュ＋ポン＋キラッ（いちばん美味しそうな瞬間）
     実音（ジュージュー）は強調して残し、合成BGMと効果音を重ねる。
+    music="georgian" でジョージア風BGM（music.py）。wide=True で 1920×1080 の横長
+    （縦の素材は中央に置き、左右は黒。ぼかし帯は使わない）。
     """
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg がありません")
+    ow, oh = (1920, 1080) if wide else (W, H)
     srcs = []
     for p, *_ in segments:
         if p not in srcs:
@@ -377,13 +380,17 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
     lens = [(e - s0) / sp for _, s0, e, sp in segments]
     total = sum(lens)
     reveal = sum(lens[:reveal_index])
-    if total > 90:
-        raise ValueError("完成が %.0f 秒になります（90秒以内に）" % total)
+    if total > max_len:
+        raise ValueError("完成が %.0f 秒になります（%d秒以内に）" % (total, max_len))
 
     tmp = tempfile.mkdtemp(prefix="montage_")
     try:
         bed = os.path.join(tmp, "bed.wav")
-        write_wav(bed, synth_bed(total + 0.5, reveal))
+        if music == "georgian":
+            import music as MU
+            write_wav(bed, MU.georgian_bed(total + 0.5, reveal))
+        else:
+            write_wav(bed, synth_bed(total + 0.5, reveal))
         cmd = ["ffmpeg", "-y", "-v", "error"]
         for p in srcs:
             cmd += ["-i", p]
@@ -398,9 +405,12 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
             if audio[p]:
                 parts.append("[%d:a]asplit=%d%s" % (i, uses[p], "".join("[a%d_%d]" % (i, k) for k in range(uses[p]))))
         for n, (p, s0, e, sp) in enumerate(segments):
-            v = ("[{l}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp},"
-                 "scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1").format(
-                     l=next(vlabels[p]), s=s0, e=e, sp=sp, w=W, h=H)
+            if wide:
+                fit = "scale=-2:{h},pad={w}:{h}:(ow-iw)/2:0:black,setsar=1".format(w=ow, h=oh)
+            else:
+                fit = "scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1".format(w=ow, h=oh)
+            v = ("[{l}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp},{fit}").format(
+                     l=next(vlabels[p]), s=s0, e=e, sp=sp, fit=fit)
             if sp < 1:
                 v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
             parts.append(v + ",fps=%d[sv%d]" % (FPS, n))
@@ -418,18 +428,22 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
         parts.append("[ca]highpass=f=90,equalizer=f=5500:t=q:w=1.2:g=5,"
                      "acompressor=threshold=-24dB:ratio=3:attack=5:release=150:makeup=3[real]")
         parts.append("[%d:a]aformat=channel_layouts=mono[bed]" % len(srcs))
-        parts.append("[real][bed]amix=inputs=2:weights='1 0.8':normalize=0:duration=first,"
+        wts = "0.6 1.1" if music == "georgian" else "1 0.8"   # YouTube は音楽を前に
+        parts.append("[real][bed]amix=inputs=2:weights='%s':normalize=0:duration=first,"
                      "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.7:level=false,"
-                     "aresample=%d,aformat=channel_layouts=stereo[outa]" % SR)
+                     "aresample=%d,aformat=channel_layouts=stereo[outa]" % (wts, SR))
         cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
                 "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
-                "-maxrate", "8M", "-bufsize", "16M", "-r", str(FPS),
+                # 長い動画でも GitHub の 100MB 未満に収まるよう上限を決める
+                "-maxrate", "%.1fM" % min(8.0, 600.0 / total), "-bufsize", "16M", "-r", str(FPS),
                 "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
                 "-movflags", "+faststart", "-t", "%.3f" % total, out]
         os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
         subprocess.run(cmd, check=True)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+    if os.path.getsize(out) >= 100e6:
+        raise RuntimeError("完成ファイルが 100MB を超えました: %s" % out)
     print("できました: %s（%.1f秒・%.1fMB・見せ場は %.1f 秒目）" % (out, total, os.path.getsize(out) / 1e6, reveal))
     return total
 

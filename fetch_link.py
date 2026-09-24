@@ -191,6 +191,31 @@ def montage(vids, spec):
     print("reels.json に %s として登録しました" % rid)
 
 
+def youtube(vids, spec):
+    """spec: {"id": "S1", "kind": "short"|"long", "segments": [...], "reveal_index": n,
+              "hook", "pop", "title", "description", "tags"}
+    youtube/<id>.mp4 を作って youtube.json に登録する（ジョージア風BGM）。"""
+    import make_reel as M
+    by_name = {os.path.basename(v): v for v in vids}
+    segs = [(by_name[n], float(a), float(b), float(sp)) for n, a, b, sp in spec["segments"]]
+    long_ = spec.get("kind") == "long"
+    rel = "youtube/%s.mp4" % spec["id"]
+    M.render_montage(segs, os.path.join(ROOT, rel), spec.get("reveal_index", 0),
+                     hook=spec.get("hook", ""), pop=spec.get("pop", ""), dish=spec.get("dish", ""),
+                     music="georgian", wide=long_, max_len=600 if long_ else 90)
+    path = os.path.join(ROOT, "youtube.json")
+    q = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {"order": [], "posts": {}}
+    q["posts"][spec["id"]] = {"id": spec["id"], "kind": "long" if long_ else "short", "video": rel,
+                              "title": spec["title"], "description": spec["description"],
+                              "tags": spec.get("tags", [])}
+    if spec["id"] not in q["order"]:
+        q["order"].append(spec["id"])
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(q, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    print("youtube.json に %s を登録しました" % spec["id"])
+
+
 def main():
     job = json.load(open(os.path.join(ROOT, "jobs", "link.json"), encoding="utf-8"))
     vids = download(job["url"])
@@ -200,6 +225,9 @@ def main():
         preview(vids)
     elif job["mode"] == "montage":
         montage(vids, job["montage"])
+    elif job["mode"] == "youtube":
+        for spec in job["youtube"]:
+            youtube(vids, spec)
     else:
         render(vids, job.get("clips", {}))
     return 0

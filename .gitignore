@@ -13,3 +13,5 @@ R1_20seconds_v*.mp4
 /*.mp4
 # 小さくできなかった動画（送らない）
 inbox_保留/
+# 下見用のコマ見本（from_link.yml が作る。コミットしない）
+preview/

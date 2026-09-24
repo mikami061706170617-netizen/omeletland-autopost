@@ -174,11 +174,20 @@ def montage(vids, spec):
     by_name = {os.path.basename(v): v for v in vids}
     segs = [(by_name[n], float(a), float(b), float(sp)) for n, a, b, sp in spec["segments"]]
     reels = M.load_reels()
-    rid = M.next_id(reels)
-    rel = "reels/%s_%s.mp4" % (rid, M.slug(spec.get("dish") or "omurice"))
+    if spec.get("replace"):            # 既存のリールを作り直す（IDと順番はそのまま）
+        rid = spec["replace"]
+        rel = reels["posts"][rid]["video"]
+    else:
+        rid = M.next_id(reels)
+        rel = "reels/%s_%s.mp4" % (rid, M.slug(spec.get("dish") or "omurice"))
     M.render_montage(segs, os.path.join(ROOT, rel), spec.get("reveal_index", 0),
                      hook=spec.get("hook", ""), pop=spec.get("pop", ""),
-                     dish=spec.get("dish", ""), price=spec.get("price"))
+                     dish=spec.get("dish", ""), price=spec.get("price"),
+                     music=spec.get("music", "grand"))
+    if spec.get("replace"):
+        M.save_reels(reels)
+        print("%s を作り直しました" % rid)
+        return
     M.register(reels, rel, spec.get("dish", ""), spec.get("price"), spec.get("title"))
     if spec.get("caption"):
         reels["posts"][rid]["caption"] = spec["caption"]
@@ -202,7 +211,7 @@ def youtube(vids, spec):
     rel = "youtube/%s.mp4" % spec["id"]
     M.render_montage(segs, os.path.join(ROOT, rel), spec.get("reveal_index", 0),
                      hook=spec.get("hook", ""), pop=spec.get("pop", ""), dish=spec.get("dish", ""),
-                     music="georgian", wide=long_, max_len=600 if long_ else 90)
+                     music=spec.get("music", "grand"), wide=long_, max_len=600 if long_ else 90)
     path = os.path.join(ROOT, "youtube.json")
     q = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {"order": [], "posts": {}}
     q["posts"][spec["id"]] = {"id": spec["id"], "kind": "long" if long_ else "short", "video": rel,
@@ -228,6 +237,9 @@ def main():
     elif job["mode"] == "youtube":
         for spec in job["youtube"]:
             youtube(vids, spec)
+    elif job["mode"] == "batch":       # リールと YouTube をまとめて
+        for spec in job["items"]:
+            (youtube if spec.get("type") == "youtube" else montage)(vids, spec)
     else:
         render(vids, job.get("clips", {}))
     return 0

@@ -360,13 +360,13 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
 
 
 def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=None,
-                   place="JAPAN FOOD HUB · SABURTALO", music="default", wide=False, max_len=90):
+                   place="JAPAN FOOD HUB · SABURTALO", music="grand", wide=False, max_len=90):
     """複数の動画から区間をつなげて1本のリールにする。
 
     segments: [(元動画のパス, 開始秒, 終了秒, 速度), ...]  速度 2.0 = 2倍速、0.5 = スロー
     reveal_index: この区間の頭で白フラッシュ＋ポン＋キラッ（いちばん美味しそうな瞬間）
     実音（ジュージュー）は強調して残し、合成BGMと効果音を重ねる。
-    music="georgian" でジョージア風BGM（music.py）。wide=True で 1920×1080 の横長
+    music="grand"（既定）で料理ドラマ風BGM（cinematic.py）、"georgian" でジョージア風（music.py）。wide=True で 1920×1080 の横長
     （縦の素材は中央に置き、左右は黒。ぼかし帯は使わない）。
     """
     if not shutil.which("ffmpeg"):
@@ -386,7 +386,10 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
     tmp = tempfile.mkdtemp(prefix="montage_")
     try:
         bed = os.path.join(tmp, "bed.wav")
-        if music == "georgian":
+        if music == "grand":
+            import cinematic
+            write_wav(bed, cinematic.grand_bed(total + 0.5, reveal))
+        elif music == "georgian":
             import music as MU
             write_wav(bed, MU.georgian_bed(total + 0.5, reveal))
         else:
@@ -428,7 +431,8 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
         parts.append("[ca]highpass=f=90,equalizer=f=5500:t=q:w=1.2:g=5,"
                      "acompressor=threshold=-24dB:ratio=3:attack=5:release=150:makeup=3[real]")
         parts.append("[%d:a]aformat=channel_layouts=mono[bed]" % len(srcs))
-        wts = "0.6 1.1" if music == "georgian" else "1 0.8"   # YouTube は音楽を前に
+        # 実音（ジュージュー）を主役に、音楽は少し下げる
+        wts = {"grand": "1 0.55", "georgian": "0.8 0.6"}.get(music, "1 0.8")
         parts.append("[real][bed]amix=inputs=2:weights='%s':normalize=0:duration=first,"
                      "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.7:level=false,"
                      "aresample=%d,aformat=channel_layouts=stereo[outa]" % (wts, SR))

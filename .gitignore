@@ -6,3 +6,8 @@ __pycache__/
 _thumbs/
 _reel/
 R1_20seconds_v*.mp4
+
+# 直下に置いた動画はコミットしない（編集したい動画は inbox/ へ）
+/*.MOV
+/*.mov
+/*.mp4

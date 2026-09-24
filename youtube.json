@@ -1,0 +1,81 @@
+{
+  "order": [
+    "S1",
+    "S2",
+    "S3",
+    "L1"
+  ],
+  "posts": {
+    "S1": {
+      "id": "S1",
+      "kind": "short",
+      "video": "youtube/S1.mp4",
+      "title": "ジョージアの煮込み×オムライス！ハルチョーオムライスができるまで #shorts",
+      "description": "ジョージアの伝統料理「ハルチョー」（牛肉のスパイス煮込み）をオムライスに。トビリシの厨房から。\n\n📍 Omelet Land Tbilisi（Japan Food Hub 内）\n1 Davit Gamrekeli St, Saburtalo, Tbilisi / 毎日 11:00–23:00\nInstagram: @omeletland.tbilisi\n\nBGM：オリジナル（ジョージア風）",
+      "tags": [
+        "オムライス",
+        "ジョージア",
+        "トビリシ",
+        "ハルチョー",
+        "omurice",
+        "kharcho",
+        "tbilisi",
+        "shorts"
+      ]
+    },
+    "S2": {
+      "id": "S2",
+      "kind": "short",
+      "video": "youtube/S2.mp4",
+      "title": "箸でパカーン！とろとろ半熟オムライス #shorts",
+      "description": "ご飯の上で箸で開くと、半熟卵がとろ〜り。ジョージア・トビリシのオムライス屋から。\n\n📍 Omelet Land Tbilisi（Japan Food Hub 内）\n1 Davit Gamrekeli St, Saburtalo, Tbilisi / 毎日 11:00–23:00\nInstagram: @omeletland.tbilisi\n\nBGM：オリジナル（ジョージア風）",
+      "tags": [
+        "オムライス",
+        "半熟",
+        "パカーン",
+        "とろとろ",
+        "ジョージア",
+        "トビリシ",
+        "omurice",
+        "shorts"
+      ]
+    },
+    "S3": {
+      "id": "S3",
+      "kind": "short",
+      "video": "youtube/S3.mp4",
+      "title": "ナイフでパカーン！半熟オムレツがご飯を包む瞬間 #shorts",
+      "description": "焼きたてのオムレツをご飯にのせて、ナイフでスッ。トビリシのオムライス屋の厨房から。\n\n📍 Omelet Land Tbilisi（Japan Food Hub 内）\n1 Davit Gamrekeli St, Saburtalo, Tbilisi / 毎日 11:00–23:00\nInstagram: @omeletland.tbilisi\n\nBGM：オリジナル（ジョージア風）",
+      "tags": [
+        "オムライス",
+        "半熟",
+        "パカーン",
+        "オムレツ",
+        "ジョージア",
+        "トビリシ",
+        "omurice",
+        "shorts"
+      ]
+    },
+    "L1": {
+      "id": "L1",
+      "kind": "long",
+      "video": "youtube/L1.mp4",
+      "title": "【ジョージア・トビリシ】オムライス屋の厨房｜半熟パカーン2連発＆ハルチョーオムライスができるまで",
+      "description": "ジョージアの首都トビリシで営業しているオムライス屋の厨房です。\n\n0:00 ナイフでパカーン\n0:36 箸でパカーン\n1:05 ハルチョーオムライスを包む\n1:34 ハルチョー・クリーム・パクチーで仕上げ\n\n\n📍 Omelet Land Tbilisi（Japan Food Hub 内）\n1 Davit Gamrekeli St, Saburtalo, Tbilisi / 毎日 11:00–23:00\nInstagram: @omeletland.tbilisi\n\nBGM：オリジナル（ジョージア風）",
+      "tags": [
+        "オムライス",
+        "ジョージア",
+        "トビリシ",
+        "海外飲食店",
+        "厨房",
+        "半熟",
+        "パカーン",
+        "ハルチョー",
+        "omurice",
+        "tbilisi",
+        "georgia"
+      ]
+    }
+  }
+}

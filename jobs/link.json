@@ -1,13 +1,75 @@
 {
   "url": "https://113.gigafile.nu/0930-86741790143b0be1bfba166efd3d3416",
-  "mode": "preview",
-  "try": 3,
-  "sheets": [
-    ["IMG_1067.mov", 360, 400, 1.0],
-    ["IMG_1067.mov", 400, 434, 1.0],
-    ["IMG_1068.mov", 0, 40, 1.0],
-    ["IMG_1068.mov", 44, 84, 1.0],
-    ["IMG_1066.mov", 0, 20, 0.5]
-  ],
-  "clips": {}
+  "mode": "montage",
+  "montage": {
+    "segments": [
+      [
+        "IMG_1066.mov",
+        0.0,
+        3.0,
+        1.5
+      ],
+      [
+        "IMG_1067.mov",
+        371.5,
+        376.5,
+        1.25
+      ],
+      [
+        "IMG_1067.mov",
+        378.0,
+        392.0,
+        3.5
+      ],
+      [
+        "IMG_1067.mov",
+        394.5,
+        399.5,
+        1.25
+      ],
+      [
+        "IMG_1067.mov",
+        400.0,
+        416.0,
+        4.0
+      ],
+      [
+        "IMG_1067.mov",
+        417.0,
+        420.0,
+        0.6
+      ],
+      [
+        "IMG_1068.mov",
+        0.5,
+        5.5,
+        1.2
+      ],
+      [
+        "IMG_1068.mov",
+        50.5,
+        55.5,
+        1.25
+      ],
+      [
+        "IMG_1068.mov",
+        69.5,
+        75.5,
+        1.2
+      ],
+      [
+        "IMG_1069.mov",
+        0.0,
+        8.2,
+        1.0
+      ]
+    ],
+    "reveal_index": 5,
+    "hook": "Georgian kharcho x omurice",
+    "pop": "KHARCHO OMURICE",
+    "dish": "Kharcho Omurice",
+    "title": "Kharcho Omurice — from the pan to the plate",
+    "caption": "Georgian kharcho meets Japanese omurice.\nSlow-cooked beef kharcho, fluffy egg, fresh coriander.\n\nქართული ხარჩო შეხვდა იაპონურ ომურაისს.\nნელ ცეცხლზე მოხარშული ძროხის ხარჩო, ფაფუკი კვერცხი, ახალი ქინძი.\n\nジョージアのハルチョー × 日本のオムライス。\n\nJapan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni St), Saburtalo\n6 min from Technical University metro · Open daily 11:00–23:00\n\n#omurice #tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #saburtalo #japanesefoodtbilisi #georgia #თბილისი #საბურთალო #ომურაისი #オムライス #トビリシ #foodasmr #satisfying #kharcho #ხარჩო",
+    "first": true
+  }
 }

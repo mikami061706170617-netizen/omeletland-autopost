@@ -165,6 +165,30 @@ def render(vids, clips):
         M.make_and_register(by_name[name], dict(opts))
 
 
+def montage(vids, spec):
+    """spec: {"segments": [[名前, 開始, 終了, 速度], ...], "reveal_index": n,
+              "hook", "pop", "dish", "price", "title", "caption"}"""
+    import make_reel as M
+    by_name = {os.path.basename(v): v for v in vids}
+    segs = [(by_name[n], float(a), float(b), float(sp)) for n, a, b, sp in spec["segments"]]
+    reels = M.load_reels()
+    rid = M.next_id(reels)
+    rel = "reels/%s_%s.mp4" % (rid, M.slug(spec.get("dish") or "omurice"))
+    M.render_montage(segs, os.path.join(ROOT, rel), spec.get("reveal_index", 0),
+                     hook=spec.get("hook", ""), pop=spec.get("pop", ""),
+                     dish=spec.get("dish", ""), price=spec.get("price"))
+    M.register(reels, rel, spec.get("dish", ""), spec.get("price"), spec.get("title"))
+    if spec.get("caption"):
+        reels["posts"][rid]["caption"] = spec["caption"]
+    if spec.get("first"):
+        reels["order"].remove(rid)
+        posted = {"R1"}
+        idx = next((k for k, r in enumerate(reels["order"]) if r not in posted), len(reels["order"]))
+        reels["order"].insert(idx, rid)
+    M.save_reels(reels)
+    print("reels.json に %s として登録しました" % rid)
+
+
 def main():
     job = json.load(open(os.path.join(ROOT, "jobs", "link.json"), encoding="utf-8"))
     vids = download(job["url"])
@@ -172,6 +196,8 @@ def main():
     SHEETS.extend(job.get("sheets", []))
     if job.get("mode", "preview") == "preview":
         preview(vids)
+    elif job["mode"] == "montage":
+        montage(vids, job["montage"])
     else:
         render(vids, job.get("clips", {}))
     return 0

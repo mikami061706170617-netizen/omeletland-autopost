@@ -349,6 +349,81 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
     return total
 
 
+def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=None,
+                   place="JAPAN FOOD HUB · SABURTALO"):
+    """複数の動画から区間をつなげて1本のリールにする。
+
+    segments: [(元動画のパス, 開始秒, 終了秒, 速度), ...]  速度 2.0 = 2倍速、0.5 = スロー
+    reveal_index: この区間の頭で白フラッシュ＋ポン＋キラッ（いちばん美味しそうな瞬間）
+    実音（ジュージュー）は強調して残し、合成BGMと効果音を重ねる。
+    """
+    if not shutil.which("ffmpeg"):
+        raise RuntimeError("ffmpeg がありません")
+    srcs = []
+    for p, *_ in segments:
+        if p not in srcs:
+            srcs.append(p)
+    audio = {p: probe(p)[1] for p in srcs}
+    lens = [(e - s0) / sp for _, s0, e, sp in segments]
+    total = sum(lens)
+    reveal = sum(lens[:reveal_index])
+    if total > 90:
+        raise ValueError("完成が %.0f 秒になります（90秒以内に）" % total)
+
+    tmp = tempfile.mkdtemp(prefix="montage_")
+    try:
+        bed = os.path.join(tmp, "bed.wav")
+        write_wav(bed, synth_bed(total + 0.5, reveal))
+        cmd = ["ffmpeg", "-y", "-v", "error"]
+        for p in srcs:
+            cmd += ["-i", p]
+        cmd += ["-i", bed]
+        parts, cat = [], []
+        uses = {p: sum(1 for q, *_ in segments if q == p) for p in srcs}
+        vlabels = {p: iter(["v%d_%d" % (srcs.index(p), k) for k in range(uses[p])]) for p in srcs}
+        alabels = {p: iter(["a%d_%d" % (srcs.index(p), k) for k in range(uses[p])]) for p in srcs}
+        for p in srcs:
+            i = srcs.index(p)
+            parts.append("[%d:v]split=%d%s" % (i, uses[p], "".join("[v%d_%d]" % (i, k) for k in range(uses[p]))))
+            if audio[p]:
+                parts.append("[%d:a]asplit=%d%s" % (i, uses[p], "".join("[a%d_%d]" % (i, k) for k in range(uses[p]))))
+        for n, (p, s0, e, sp) in enumerate(segments):
+            v = ("[{l}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp},"
+                 "scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1").format(
+                     l=next(vlabels[p]), s=s0, e=e, sp=sp, w=W, h=H)
+            if sp < 1:
+                v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
+            parts.append(v + ",fps=%d[sv%d]" % (FPS, n))
+            if audio[p]:
+                parts.append("[{l}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,atempo={sp},"
+                             "aformat=sample_rates={sr}:channel_layouts=mono[sa{n}]".format(
+                                 l=next(alabels[p]), s=s0, e=e, sp=sp, sr=SR, n=n))
+            else:
+                parts.append("anullsrc=r=%d:cl=mono,atrim=0:%.3f[sa%d]" % (SR, lens[n], n))
+            cat.append("[sv%d][sa%d]" % (n, n))
+        parts.append("%sconcat=n=%d:v=1:a=1[cv][ca]" % ("".join(cat), len(segments)))
+        dish_line = dish + (" · %s GEL" % price if price else "") if dish else ""
+        look = look_chain(reveal, total, (hook, pop, dish_line, place), tmp, find_font(), crop=False)
+        parts.append("[cv]" + ",".join(look) + "[outv]")
+        parts.append("[ca]highpass=f=90,equalizer=f=5500:t=q:w=1.2:g=5,"
+                     "acompressor=threshold=-24dB:ratio=3:attack=5:release=150:makeup=3[real]")
+        parts.append("[%d:a]aformat=channel_layouts=mono[bed]" % len(srcs))
+        parts.append("[real][bed]amix=inputs=2:weights='1 0.8':normalize=0:duration=first,"
+                     "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.7:level=false,"
+                     "aresample=%d,aformat=channel_layouts=stereo[outa]" % SR)
+        cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
+                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+                "-maxrate", "8M", "-bufsize", "16M", "-r", str(FPS),
+                "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
+                "-movflags", "+faststart", "-t", "%.3f" % total, out]
+        os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+        subprocess.run(cmd, check=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    print("できました: %s（%.1f秒・%.1fMB・見せ場は %.1f 秒目）" % (out, total, os.path.getsize(out) / 1e6, reveal))
+    return total
+
+
 STEP_SEC, HERO_SEC = 2.0, 5.0
 
 

@@ -102,3 +102,17 @@ Mac で試しに作るとき（ffmpeg がある場合）:
 ```
 python3 make_reel.py 動画.mov --reveal 14.5 --dish "No.01 Classic Omurice" --price 25 --out 試し.mp4
 ```
+
+## YouTube（オムライス研究所 三上きょうへい）— 2026-09-24 追加
+| ファイル | 役割 |
+|---|---|
+| `youtube.json` | YouTube の投稿待ち（Shorts=縦 / ロング=横 1920×1080） |
+| `youtube/*.mp4` | 動画本体（ジョージア風の自作BGM入り） |
+| `post_youtube.py` / `.github/workflows/youtube.yml` | 毎日 11:00 UTC（日本20:00）に Shorts 1本、日曜はロングも |
+| `music.py` | ジョージア風BGMの自動作曲（6/8拍子・パンドゥリ風・太鼓・ドローン・笛） |
+
+- 今は **notify モード**：YouTube にはアップせず、Issue で「今日の動画（保存リンク）・タイトル・説明・タグ」を知らせる。
+  スマホで動画を保存 → YouTube アプリから投稿 → Issue を閉じる。
+- Google の API 審査に合格したら、Secrets に `YT_CLIENT_ID` / `YT_CLIENT_SECRET` / `YT_REFRESH_TOKEN`、
+  Variables に `YT_MODE=auto` を入れると自動で公開アップロードになる（審査前に API で上げた動画は非公開に固定されるので注意）。
+- 動画は `jobs/link.json` の `mode: "youtube"` で、共有リンクの素材から作る（`fetch_link.py`）。

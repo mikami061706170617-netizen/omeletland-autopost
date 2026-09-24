@@ -1,0 +1,55 @@
+name: youtube post
+
+# 毎日 11:00 UTC（日本 20:00 / トビリシ 15:00）に Shorts を1本、日曜はロングも1本。
+# 今は notify モード: Issue で「今日の動画・タイトル・説明」を知らせ、スマホから手で投稿する。
+# API 審査に通ったら、リポジトリの Variables に YT_MODE=auto を入れると自動アップロードに変わる。
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "投稿せずに中身だけ表示する"
+        type: boolean
+        default: false
+      force_long:
+        description: "曜日に関係なくロングも出す"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: state-json
+  cancel-in-progress: false
+
+jobs:
+  youtube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: post
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          YT_MODE: ${{ vars.YT_MODE }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          FORCE_LONG: ${{ inputs.force_long }}
+        run: python3 post_youtube.py
+
+      - name: record
+        if: ${{ success() && inputs.dry_run != true }}
+        run: |
+          if [ -n "$(git status --porcelain state.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state.json
+            git commit -m "youtube $(date -u +%F)"
+            git pull --rebase origin main
+            git push
+          fi

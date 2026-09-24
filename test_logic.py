@@ -114,6 +114,10 @@ check("早送り→スロー→等速の3区間", [s[2] for s in segs] == [M.FAS
 check("パカーンの位置がスロー区間の中", abs(rv - (25.2 / M.FAST + 0.8 / M.SLOW)) < 1e-6, "%.2f秒" % rv)
 _, _, long_total = M.timeline(0, 150, 140)
 check("長い動画でも60秒以内に収める", long_total <= M.MAX_LEN + 0.01, "%.1f秒" % long_total)
+_, _, t7 = M.timeline(0, 434, 434 * 0.65)
+check("7分の動画でも60秒以内に収める", t7 <= M.MAX_LEN + 0.01, "%.1f秒" % t7)
+_, _, t20 = M.timeline(0, 1200, 1100)
+check("20分の動画でも60秒以内に収める", t20 <= M.MAX_LEN + 0.01, "%.1f秒" % t20)
 cap = M.caption_for("No.01 Classic Omurice", 25)
 check("自動キャプションが制限内", len(cap) <= 2200 and cap.count("#") <= 30,
       "%d文字 / タグ%d個" % (len(cap), cap.count("#")))
@@ -125,6 +129,27 @@ check("ファイル名の _t14.5 を読める", o.get("reveal") == 14.5, str(o))
 PR.today_str = lambda: "2026-10-01"
 pid, stop = PR.pick(fake, {"reels_history": [{"id": "R1", "date": "2026-09-20"}]})
 check("未投稿のリールから順に出る", pid == "R2", pid or stop)
+
+print("\n[7] YouTube（youtube.json と毎日の順番）")
+import post_youtube as Y
+yq = {"order": ["S1", "L1", "S2"], "posts": {
+    "S1": {"id": "S1", "kind": "short", "video": "youtube/S1.mp4", "title": "a", "description": "d"},
+    "L1": {"id": "L1", "kind": "long", "video": "youtube/L1.mp4", "title": "b", "description": "d"},
+    "S2": {"id": "S2", "kind": "short", "video": "youtube/S2.mp4", "title": "c", "description": "d"}}}
+Y.today_str = lambda: "2026-09-26"
+st = {"youtube_history": [{"id": "S1", "kind": "short", "date": "2026-09-25"}]}
+check("次のショートは S2", (Y.pick(yq, st, "short") or {}).get("id") == "S2")
+check("ロングは L1", (Y.pick(yq, st, "long") or {}).get("id") == "L1")
+st["youtube_history"].append({"id": "S2", "kind": "short", "date": "2026-09-26"})
+check("同じ日に2本目のショートは出さない", Y.pick(yq, st, "short") is None)
+if os.path.exists(os.path.join(ROOT, "youtube.json")):
+    yj = json.load(open(os.path.join(ROOT, "youtube.json"), encoding="utf-8"))
+    for vid in yj["order"]:
+        p = yj["posts"][vid]
+        ok = (len(p["title"]) <= 100 and len(p["description"]) <= 5000
+              and os.path.exists(os.path.join(ROOT, p["video"]))
+              and os.path.getsize(os.path.join(ROOT, p["video"])) < 100e6)
+        check("%s %s" % (vid, p["video"]), ok, "%d文字" % len(p["title"]))
 
 print("\n" + ("すべて通過しました。" if not fails else "失敗: " + ", ".join(fails)))
 sys.exit(1 if fails else 0)

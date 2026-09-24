@@ -43,6 +43,8 @@ FAST = 1.6          # 焼いている前半の早送り倍率
 SLOW = 0.5          # パカーンの瞬間のスロー倍率
 PRE, POST = 0.8, 1.2  # パカーンの前後何秒をスローにするか（元動画の秒）
 MAX_LEN = 58.0      # ストーリーズ（60秒まで）にもそのまま出せる長さ
+TAIL_MAX = 10.0     # パカーンの後に残す長さ（元動画の秒）
+FAST_MAX = 12.0     # 長い動画はここまで早送り（タイムラプス風）
 
 FONTS = [
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",       # Mac
@@ -70,13 +72,17 @@ def timeline(start, end, reveal):
     reveal = min(max(reveal, start), end)
     a0, a1 = start, max(start, reveal - PRE)
     b1 = min(end, reveal + POST)
+    end = min(end, b1 + TAIL_MAX)   # 盛り付け後が長い動画は切る
     c_len = end - b1
     slow_len = (b1 - a1) / SLOW
 
     fast = FAST
     if (a1 - a0) / fast + slow_len + c_len > MAX_LEN and a1 > a0:
         room = MAX_LEN - slow_len - c_len
-        fast = min(4.0, (a1 - a0) / room) if room > 0 else 4.0
+        fast = min(FAST_MAX, (a1 - a0) / room) if room > 0 else FAST_MAX
+    if (a1 - a0) / fast + slow_len + c_len > MAX_LEN:
+        # 12倍でも収まらないほど長い動画は、パカーンに近い後半だけ使う
+        a0 = a1 - (MAX_LEN - slow_len - c_len) * fast
 
     segs = [s for s in [(a0, a1, fast), (a1, b1, SLOW), (b1, end, 1.0)] if s[1] - s[0] > 0.05]
     out_reveal = (a1 - a0) / fast + (reveal - a1) / SLOW
@@ -95,8 +101,12 @@ CHORDS = [[53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60], [48, 52, 55, 59]
 BEAT = 0.6  # 100 BPM
 
 
-def synth_bed(total, reveal):
-    """BGM＋効果音をモノラルfloat配列で返す（-1〜1）。"""
+def synth_bed(total, reveal, sizzle_until=0.0):
+    """BGM＋効果音をモノラルfloat配列で返す（-1〜1）。
+
+    sizzle_until > 0 のときは 0〜その秒まで焼き音（ジュージュー）も合成する
+    （写真から作るときは実音が無いため）。
+    """
     n = int(total * SR)
     buf = array.array("f", bytes(4 * n))
     rnd = random.Random(7)
@@ -168,6 +178,20 @@ def synth_bed(total, reveal):
         add(reveal + 0.08 + j * 0.06, 1.2,
             lambda x, q=q: 0.06 * math.exp(-5 * x) * math.sin(two_pi * q * x))
 
+    # ジュージュー（高域ノイズ＋ときどきパチッ）
+    if sizzle_until > 0:
+        prev = 0.0
+        crackle = 0.0
+        for i in range(min(n, int(sizzle_until * SR))):
+            x = i / SR
+            env = min(1, x / 0.3) * min(1, (sizzle_until - x) / 0.4)
+            w = rnd.random() * 2 - 1
+            hp, prev = w - prev, w
+            if rnd.random() < 0.0006:
+                crackle = 0.5 * (rnd.random() + 0.3)
+            crackle *= 0.992
+            buf[i] += env * (0.045 * hp + crackle * (rnd.random() * 2 - 1))
+
     peak = max(1e-9, max(abs(v) for v in buf))
     if peak > 0.95:
         for i in range(n):
@@ -189,6 +213,16 @@ def write_wav(path, samples):
 
 # ---------------------------------------------------------------- 映像
 
+def atempo(sp):
+    """atempo は 0.5〜100 倍しか受け付けないので、遅いときは重ねる。"""
+    parts = []
+    while sp < 0.5:
+        parts.append("atempo=0.5")
+        sp /= 0.5
+    parts.append("atempo=%s" % round(sp, 6))
+    return ",".join(parts)
+
+
 def probe(src):
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "stream=codec_type:format=duration",
@@ -207,8 +241,8 @@ def find_font():
 
 def _text(tmp, name, text, font, size, y, t0, t1, color="white"):
     """drawtext 1個分。文字はファイル経由で渡す（記号のエスケープ事故を防ぐ）。"""
-    # 横幅に収まるよう文字サイズを自動で下げる（太字の平均字幅 ≒ 0.62×サイズ）
-    size = max(28, min(size, int(W * 0.88 / (0.62 * max(1, len(text))))))
+    # 横幅に収まるよう文字サイズを自動で下げる（太字の平均字幅 ≒ 0.72×サイズ。大文字は広いので余裕をみる）
+    size = max(28, min(size, int(W * 0.88 / (0.72 * max(1, len(text))))))
     path = os.path.join(tmp, name + ".txt")
     with open(path, "w", encoding="utf-8") as f:
         f.write(text)
@@ -218,34 +252,17 @@ def _text(tmp, name, text, font, size, y, t0, t1, color="white"):
                 font=font, path=path, size=size, color=color, y=y, t0=t0, t1=t1)
 
 
-def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
-    parts = []
-    n = len(segs)
-    parts.append("[0:v]split=%d%s" % (n, "".join("[v%d]" % i for i in range(n))))
-    if has_audio:
-        parts.append("[0:a]asplit=%d%s" % (n, "".join("[a%d]" % i for i in range(n))))
-    cat = []
-    for i, (s, e, sp) in enumerate(segs):
-        v = "[v{i}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp}".format(i=i, s=s, e=e, sp=sp)
-        if sp < 1:
-            v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
-        parts.append(v + ",fps=%d[sv%d]" % (FPS, i))
-        if has_audio:
-            parts.append("[a{i}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,atempo={sp}[sa{i}]"
-                         .format(i=i, s=s, e=e, sp=sp))
-        else:
-            parts.append("anullsrc=r=%d:cl=mono,atrim=0:%.3f[sa%d]" % (SR, (e - s) / sp, i))
-        cat.append("[sv%d][sa%d]" % (i, i))
-    parts.append("%sconcat=n=%d:v=1:a=1[cv][ca]" % ("".join(cat), n))
-
-    look = [
-        "scale=%d:%d:force_original_aspect_ratio=increase" % (W, H),
-        "crop=%d:%d" % (W, H),
+def look_chain(reveal, total, texts, tmp, font, crop=True, sharp=0.7):
+    """色づけ・フラッシュ・文字入れ（動画でも写真でも共通）。"""
+    look = []
+    if crop:
+        look += ["scale=%d:%d:force_original_aspect_ratio=increase" % (W, H), "crop=%d:%d" % (W, H)]
+    look += [
         # 暖色・彩度・コントラストで「焼きたて」の色に
         "eq=contrast=1.07:brightness=0.02:saturation=1.25",
         "colorbalance=rm=0.05:gm=0.01:bm=-0.05:rh=0.03:bh=-0.03",
         "vibrance=intensity=0.15",
-        "unsharp=5:5:0.7:5:5:0",
+        "unsharp=5:5:%.2f:5:5:0" % sharp,
         "vignette=angle=PI/6",
         # パカーンの瞬間の白フラッシュ
         "drawbox=x=0:y=0:w=iw:h=ih:color=white@0.45:t=fill:enable='between(t,%.2f,%.2f)'"
@@ -265,6 +282,30 @@ def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
             look.append(_text(tmp, "place", place, font, 44, "h*0.78", max(reveal + 1.7, total - 3.8),
                               total))
     look.append("format=yuv420p")
+    return look
+
+
+def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
+    parts = []
+    n = len(segs)
+    parts.append("[0:v]split=%d%s" % (n, "".join("[v%d]" % i for i in range(n))))
+    if has_audio:
+        parts.append("[0:a]asplit=%d%s" % (n, "".join("[a%d]" % i for i in range(n))))
+    cat = []
+    for i, (s, e, sp) in enumerate(segs):
+        v = "[v{i}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp}".format(i=i, s=s, e=e, sp=sp)
+        if sp < 1:
+            v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
+        parts.append(v + ",fps=%d[sv%d]" % (FPS, i))
+        if has_audio:
+            parts.append("[a{i}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,{at}[sa{i}]"
+                         .format(i=i, s=s, e=e, at=atempo(sp)))
+        else:
+            parts.append("anullsrc=r=%d:cl=mono,atrim=0:%.3f[sa%d]" % (SR, (e - s) / sp, i))
+        cat.append("[sv%d][sa%d]" % (i, i))
+    parts.append("%sconcat=n=%d:v=1:a=1[cv][ca]" % ("".join(cat), n))
+
+    look = look_chain(reveal, total, texts, tmp, font)
     parts.append("[cv]" + ",".join(look) + "[outv]")
 
     # 実音のジュージューを前に出す（高域を持ち上げて圧縮）
@@ -315,6 +356,156 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
     if size >= 100:
         raise RuntimeError("完成ファイルが %.0fMB あります（GitHubは100MB未満）" % size)
     print("できました: %s（%.1f秒・%.1fMB・パカーンは %.1f 秒目）" % (out, total, size, out_reveal))
+    return total
+
+
+def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=None,
+                   place="JAPAN FOOD HUB · SABURTALO", music="grand", wide=False, max_len=90):
+    """複数の動画から区間をつなげて1本のリールにする。
+
+    segments: [(元動画のパス, 開始秒, 終了秒, 速度), ...]  速度 2.0 = 2倍速、0.5 = スロー
+    reveal_index: この区間の頭で白フラッシュ＋ポン＋キラッ（いちばん美味しそうな瞬間）
+    実音（ジュージュー）は強調して残し、合成BGMと効果音を重ねる。
+    music="grand"（既定）で料理ドラマ風BGM（cinematic.py）、"georgian" でジョージア風（music.py）。wide=True で 1920×1080 の横長
+    （縦の素材は中央に置き、左右は黒。ぼかし帯は使わない）。
+    """
+    if not shutil.which("ffmpeg"):
+        raise RuntimeError("ffmpeg がありません")
+    ow, oh = (1920, 1080) if wide else (W, H)
+    srcs = []
+    for p, *_ in segments:
+        if p not in srcs:
+            srcs.append(p)
+    audio = {p: probe(p)[1] for p in srcs}
+    lens = [(e - s0) / sp for _, s0, e, sp in segments]
+    total = sum(lens)
+    reveal = sum(lens[:reveal_index])
+    if total > max_len:
+        raise ValueError("完成が %.0f 秒になります（%d秒以内に）" % (total, max_len))
+
+    tmp = tempfile.mkdtemp(prefix="montage_")
+    try:
+        bed = os.path.join(tmp, "bed.wav")
+        if music == "grand":
+            import cinematic
+            write_wav(bed, cinematic.grand_bed(total + 0.5, reveal))
+        elif music == "georgian":
+            import music as MU
+            write_wav(bed, MU.georgian_bed(total + 0.5, reveal))
+        else:
+            write_wav(bed, synth_bed(total + 0.5, reveal))
+        cmd = ["ffmpeg", "-y", "-v", "error"]
+        for p in srcs:
+            cmd += ["-i", p]
+        cmd += ["-i", bed]
+        parts, cat = [], []
+        uses = {p: sum(1 for q, *_ in segments if q == p) for p in srcs}
+        vlabels = {p: iter(["v%d_%d" % (srcs.index(p), k) for k in range(uses[p])]) for p in srcs}
+        alabels = {p: iter(["a%d_%d" % (srcs.index(p), k) for k in range(uses[p])]) for p in srcs}
+        for p in srcs:
+            i = srcs.index(p)
+            parts.append("[%d:v]split=%d%s" % (i, uses[p], "".join("[v%d_%d]" % (i, k) for k in range(uses[p]))))
+            if audio[p]:
+                parts.append("[%d:a]asplit=%d%s" % (i, uses[p], "".join("[a%d_%d]" % (i, k) for k in range(uses[p]))))
+        for n, (p, s0, e, sp) in enumerate(segments):
+            if wide:
+                fit = "scale=-2:{h},pad={w}:{h}:(ow-iw)/2:0:black,setsar=1".format(w=ow, h=oh)
+            else:
+                fit = "scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1".format(w=ow, h=oh)
+            v = ("[{l}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp},{fit}").format(
+                     l=next(vlabels[p]), s=s0, e=e, sp=sp, fit=fit)
+            if sp < 1:
+                v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
+            parts.append(v + ",fps=%d[sv%d]" % (FPS, n))
+            if audio[p]:
+                parts.append("[{l}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,{at},"
+                             "aformat=sample_rates={sr}:channel_layouts=mono[sa{n}]".format(
+                                 l=next(alabels[p]), s=s0, e=e, at=atempo(sp), sr=SR, n=n))
+            else:
+                parts.append("anullsrc=r=%d:cl=mono,atrim=0:%.3f[sa%d]" % (SR, lens[n], n))
+            cat.append("[sv%d][sa%d]" % (n, n))
+        parts.append("%sconcat=n=%d:v=1:a=1[cv][ca]" % ("".join(cat), len(segments)))
+        dish_line = dish + (" · %s GEL" % price if price else "") if dish else ""
+        look = look_chain(reveal, total, (hook, pop, dish_line, place), tmp, find_font(), crop=False)
+        parts.append("[cv]" + ",".join(look) + "[outv]")
+        parts.append("[ca]highpass=f=90,equalizer=f=5500:t=q:w=1.2:g=5,"
+                     "acompressor=threshold=-24dB:ratio=3:attack=5:release=150:makeup=3[real]")
+        parts.append("[%d:a]aformat=channel_layouts=mono[bed]" % len(srcs))
+        # 実音（ジュージュー）を主役に、音楽は少し下げる
+        wts = {"grand": "1 0.55", "georgian": "0.8 0.6"}.get(music, "1 0.8")
+        parts.append("[real][bed]amix=inputs=2:weights='%s':normalize=0:duration=first,"
+                     "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.7:level=false,"
+                     "aresample=%d,aformat=channel_layouts=stereo[outa]" % (wts, SR))
+        cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
+                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+                # 長い動画でも GitHub の 100MB 未満に収まるよう上限を決める
+                "-maxrate", "%.1fM" % min(8.0, 600.0 / total), "-bufsize", "16M", "-r", str(FPS),
+                "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
+                "-movflags", "+faststart", "-t", "%.3f" % total, out]
+        os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+        subprocess.run(cmd, check=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    if os.path.getsize(out) >= 100e6:
+        raise RuntimeError("完成ファイルが 100MB を超えました: %s" % out)
+    print("できました: %s（%.1f秒・%.1fMB・見せ場は %.1f 秒目）" % (out, total, os.path.getsize(out) / 1e6, reveal))
+    return total
+
+
+STEP_SEC, HERO_SEC = 2.0, 5.0
+
+
+def render_slides(steps, hero, out, hook="", pop="", dish="", price=None,
+                  place="JAPAN FOOD HUB · SABURTALO"):
+    """写真（動画から切り出した静止画でもよい）からリールを作る。
+
+    steps: 調理の途中の写真（順番どおり）。1枚 2秒、ゆっくりズーム。
+    hero : 完成写真。5秒かけて横に流し、入った瞬間にフラッシュ＋ポン＋キラッ。
+    音は実音が無いので、ジュージュー・BGM・効果音をすべて合成する。
+    """
+    if not shutil.which("ffmpeg"):
+        raise RuntimeError("ffmpeg がありません")
+    reveal = STEP_SEC * len(steps)
+    total = reveal + HERO_SEC
+    frames = int(STEP_SEC * FPS)
+    tmp = tempfile.mkdtemp(prefix="slides_")
+    try:
+        bed = os.path.join(tmp, "bed.wav")
+        write_wav(bed, synth_bed(total + 0.5, reveal, sizzle_until=reveal))
+        cmd = ["ffmpeg", "-y", "-v", "error"]
+        parts = []
+        for i, img in enumerate(steps):
+            cmd += ["-loop", "1", "-framerate", str(FPS), "-t", "%.2f" % STEP_SEC, "-i", img]
+            parts.append(
+                "[{i}:v]scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,"
+                "crop={w}:{h},setsar=1,zoompan=z='1+0.07*on/{f}':x='iw/2-(iw/zoom/2)'"
+                ":y='ih/2-(ih/zoom/2)':d=1:s={w}x{h}:fps={fps}[p{i}]".format(
+                    i=i, w=W, h=H, f=frames, fps=FPS))
+        k = len(steps)
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-t", "%.2f" % HERO_SEC, "-i", hero]
+        # 完成写真は高さを合わせ、横長なら左→右へゆっくり流す
+        parts.append(
+            "[{k}:v]scale=-2:{h}:flags=lanczos,scale='max(iw,{w})':-2,crop={w}:{h}:"
+            "x='(iw-{w})*t/{d}':y='(ih-{h})/2',setsar=1,fps={fps}[p{k}]".format(
+                k=k, w=W, h=H, d=HERO_SEC, fps=FPS))
+        cmd += ["-i", bed]
+        parts.append("%sconcat=n=%d:v=1:a=0[cv]" % ("".join("[p%d]" % i for i in range(k + 1)), k + 1))
+        dish_line = dish + (" · %s GEL" % price if price else "") if dish else ""
+        font = find_font()
+        look = look_chain(reveal, total, (hook, pop, dish_line, place), tmp, font,
+                          crop=False, sharp=0.4)
+        parts.append("[cv]" + ",".join(look) + "[outv]")
+        parts.append("[%d:a]loudnorm=I=-14:TP=-1.5:LRA=11,volume=3dB,alimiter=limit=0.7:level=false,aresample=%d,"
+                     "aformat=channel_layouts=stereo[outa]" % (k + 1, SR))
+        cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
+                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+                "-r", str(FPS), "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
+                "-movflags", "+faststart", "-t", "%.3f" % total, out]
+        os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+        subprocess.run(cmd, check=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    print("できました: %s（%.1f秒・%.1fMB）" % (out, total, os.path.getsize(out) / 1e6))
     return total
 
 
@@ -374,7 +565,7 @@ def make_and_register(src, opts, keep_source=True):
            place=opts.get("place", "JAPAN FOOD HUB · SABURTALO"))
     register(reels, rel, opts.get("dish", ""), opts.get("price"), opts.get("title"))
     save_reels(reels)
-    print("reels.json に %s として登録しました（次の月・水・金に投稿されます）" % rid)
+    print("reels.json に %s として登録しました（次の 20:00 に投稿されます）" % rid)
     if not keep_source:
         os.remove(src)
     return rid

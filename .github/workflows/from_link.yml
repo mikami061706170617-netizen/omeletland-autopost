@@ -1,0 +1,40 @@
+name: reel from link
+
+# jobs/link.json を push すると、共有リンク（ギガファイル便など）の動画を取り込んで
+# 下見（preview/ のコマ見本）か、リール化（reels/ と reels.json）をする。
+# 元動画はリポジトリに入れない。
+on:
+  push:
+    paths: ["jobs/link.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reel-from-link
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ffmpeg
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+
+      - name: fetch and edit
+        run: python3 fetch_link.py
+
+      - name: record
+        if: always()
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -f preview reels reels.json youtube youtube.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "reel from link $(date -u +%F_%H%M)"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi

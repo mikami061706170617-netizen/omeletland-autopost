@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Omelet Land Tbilisi — リールの自動投稿（Instagram Reels + Facebookページ動画）。
+"""Omelet Land Tbilisi — リールの自動投稿（Instagram Reels + ストーリーズ + Facebookページ動画）。
 
 標準ライブラリのみ。写真の毎朝投稿（post.py）とは独立して動く。
 必要な環境変数: IG_USER_ID / FB_PAGE_ID / PAGE_TOKEN
-任意: DRY_RUN=true, VIDEO_BASE_URL
+任意: DRY_RUN=true, VIDEO_BASE_URL, POST_STORY=false（ストーリーズに出さない）
 """
 import json
 import os
@@ -94,12 +94,14 @@ def pick(reels, state):
     return None, "未投稿のリールがありません（新しく撮ったら reels.json に足してください）"
 
 
-def publish_instagram(ig_user, token, url, caption):
-    params = {"media_type": "REELS", "video_url": url, "caption": caption,
-              "share_to_feed": "true", "access_token": token}
-    loc = os.environ.get("IG_LOCATION_ID")
-    if loc:
-        params["location_id"] = loc
+def publish_instagram(ig_user, token, url, caption, media_type="REELS"):
+    """REELS（フィード＋リール）または STORIES（ストーリーズ）を出す。"""
+    params = {"media_type": media_type, "video_url": url, "access_token": token}
+    if media_type == "REELS":
+        params.update({"caption": caption, "share_to_feed": "true"})
+        loc = os.environ.get("IG_LOCATION_ID")
+        if loc:
+            params["location_id"] = loc
     container = api("%s/media" % ig_user, params, "POST")["id"]
 
     waited = 0
@@ -118,10 +120,11 @@ def publish_instagram(ig_user, token, url, caption):
     media_id = api("%s/media_publish" % ig_user,
                    {"creation_id": container, "access_token": token}, "POST")["id"]
     permalink = ""
-    try:
-        permalink = api(media_id, {"fields": "permalink", "access_token": token}).get("permalink", "")
-    except Exception:
-        pass
+    if media_type == "REELS":
+        try:
+            permalink = api(media_id, {"fields": "permalink", "access_token": token}).get("permalink", "")
+        except Exception:
+            pass
     return media_id, permalink
 
 
@@ -176,6 +179,17 @@ def main():
     else:
         raise RuntimeError("Instagramへの投稿に失敗しました: %s" % last_err)
 
+    # 同じ動画をストーリーズにも出す（失敗してもリールは活かす）
+    story_id = ""
+    if os.environ.get("POST_STORY", "true").lower() not in ("0", "false", "no"):
+        for url in urls:
+            try:
+                story_id, _ = publish_instagram(ig_user, token, url, "", "STORIES")
+                print("ストーリーズに投稿しました: %s" % story_id)
+                break
+            except Exception as e:
+                print("ストーリーズは失敗しました（リールは成功）: %s" % e, file=sys.stderr)
+
     fb_id = fb_link = ""
     try:
         fb_id, fb_link = publish_facebook(page_id, token, urls[0], post["caption"])
@@ -185,6 +199,7 @@ def main():
 
     state.setdefault("reels_history", []).append({
         "id": pid, "date": today_str(), "ig": ig_id, "ig_link": ig_link, "fb": fb_id,
+        "story": story_id,
     })
     save_state(state)
     print("state.json に記録しました")

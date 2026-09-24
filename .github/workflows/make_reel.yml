@@ -1,0 +1,39 @@
+name: make reel
+
+# inbox/ に動画を置いて push すると、美味しそうに編集したリールを作って
+# reels.json に登録する。投稿そのものは reel.yml（月・水・金 20:00）が行う。
+on:
+  push:
+    branches: [main]
+    paths: ["inbox/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: make-reel
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ffmpeg
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+
+      - name: edit
+        run: python3 make_reel.py --inbox
+
+      - name: record
+        run: |
+          if [ -n "$(git status --porcelain reels reels.json inbox)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A reels reels.json inbox
+            git commit -m "reel edited $(date -u +%F)"
+            git pull --rebase origin main
+            git push
+          fi

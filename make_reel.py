@@ -213,6 +213,16 @@ def write_wav(path, samples):
 
 # ---------------------------------------------------------------- 映像
 
+def atempo(sp):
+    """atempo は 0.5〜100 倍しか受け付けないので、遅いときは重ねる。"""
+    parts = []
+    while sp < 0.5:
+        parts.append("atempo=0.5")
+        sp /= 0.5
+    parts.append("atempo=%s" % round(sp, 6))
+    return ",".join(parts)
+
+
 def probe(src):
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "stream=codec_type:format=duration",
@@ -288,8 +298,8 @@ def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
             v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
         parts.append(v + ",fps=%d[sv%d]" % (FPS, i))
         if has_audio:
-            parts.append("[a{i}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,atempo={sp}[sa{i}]"
-                         .format(i=i, s=s, e=e, sp=sp))
+            parts.append("[a{i}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,{at}[sa{i}]"
+                         .format(i=i, s=s, e=e, at=atempo(sp)))
         else:
             parts.append("anullsrc=r=%d:cl=mono,atrim=0:%.3f[sa%d]" % (SR, (e - s) / sp, i))
         cat.append("[sv%d][sa%d]" % (i, i))
@@ -395,9 +405,9 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
                 v += ",minterpolate=fps=%d:mi_mode=blend" % FPS
             parts.append(v + ",fps=%d[sv%d]" % (FPS, n))
             if audio[p]:
-                parts.append("[{l}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,atempo={sp},"
+                parts.append("[{l}]atrim={s:.3f}:{e:.3f},asetpts=PTS-STARTPTS,{at},"
                              "aformat=sample_rates={sr}:channel_layouts=mono[sa{n}]".format(
-                                 l=next(alabels[p]), s=s0, e=e, sp=sp, sr=SR, n=n))
+                                 l=next(alabels[p]), s=s0, e=e, at=atempo(sp), sr=SR, n=n))
             else:
                 parts.append("anullsrc=r=%d:cl=mono,atrim=0:%.3f[sa%d]" % (SR, lens[n], n))
             cat.append("[sv%d][sa%d]" % (n, n))
@@ -537,7 +547,7 @@ def make_and_register(src, opts, keep_source=True):
            place=opts.get("place", "JAPAN FOOD HUB · SABURTALO"))
     register(reels, rel, opts.get("dish", ""), opts.get("price"), opts.get("title"))
     save_reels(reels)
-    print("reels.json に %s として登録しました（次の月・水・金に投稿されます）" % rid)
+    print("reels.json に %s として登録しました（次の 20:00 に投稿されます）" % rid)
     if not keep_source:
         os.remove(src)
     return rid

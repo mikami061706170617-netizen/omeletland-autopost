@@ -1,19 +1,62 @@
 {
   "url": "https://113.gigafile.nu/0930-86741790143b0be1bfba166efd3d3416",
-  "mode": "preview",
-  "sheets": [
-    [
-      "IMG_1067.mov",
-      276,
-      292,
-      0.4
+  "mode": "montage",
+  "montage": {
+    "segments": [
+      [
+        "IMG_1067.mov",
+        236.0,
+        241.0,
+        1.25
+      ],
+      [
+        "IMG_1067.mov",
+        241.0,
+        258.0,
+        4.0
+      ],
+      [
+        "IMG_1067.mov",
+        258.0,
+        266.0,
+        2.0
+      ],
+      [
+        "IMG_1067.mov",
+        266.0,
+        276.0,
+        2.5
+      ],
+      [
+        "IMG_1067.mov",
+        279.0,
+        282.0,
+        1.25
+      ],
+      [
+        "IMG_1067.mov",
+        282.0,
+        283.3,
+        1.0
+      ],
+      [
+        "IMG_1067.mov",
+        283.3,
+        285.3,
+        0.4
+      ],
+      [
+        "IMG_1067.mov",
+        285.3,
+        289.5,
+        1.0
+      ]
     ],
-    [
-      "IMG_1067.mov",
-      236,
-      276,
-      1.0
-    ]
-  ],
-  "clips": {}
+    "reveal_index": 6,
+    "hook": "Wait for it...",
+    "pop": "PAKAAN!",
+    "dish": "",
+    "title": "Pakaan! — chopsticks open the soft omelette",
+    "caption": "Wait for it… chopsticks open the soft omelette right on the rice.\nEvery omurice cooked to order.\n\nდაელოდე… ფაფუკი ომლეტი ბრინჯზე იხსნება.\nყოველი ომურაისი — შეკვეთისთანავე.\n\n半熟オムレツ、パカーン。一皿ずつ注文が入ってから焼いています。\n\nJapan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni St), Saburtalo\n6 min from Technical University metro · Open daily 11:00–23:00\n\n#omurice #tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #saburtalo #japanesefoodtbilisi #georgia #თბილისი #საბურთალო #ომურაისი #オムライス #トビリシ #foodasmr #satisfying #pakaan #softomelette"
+  }
 }

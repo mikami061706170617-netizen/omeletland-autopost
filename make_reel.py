@@ -279,7 +279,7 @@ def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
 
 
 def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
-           pop="PAKAAN!", dish="", price=None):
+           pop="PAKAAN!", dish="", price=None, place="JAPAN FOOD HUB · SABURTALO"):
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg がありません（Macなら GitHub の inbox/ に置けば Actions が作ります）")
     dur, has_audio = probe(src)
@@ -291,7 +291,7 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
         raise ValueError("完成が %.0f 秒になります。--start / --end で90秒以内に絞ってください" % total)
 
     dish_line = dish + (" · %s GEL" % price if price else "") if dish else ""
-    texts = (hook, pop, dish_line, "JAPAN FOOD HUB · SABURTALO")
+    texts = (hook, pop, dish_line, place)
     font = find_font()
     if not font:
         print("※ 文字用のフォントが見つからないため、文字なしで作ります", file=sys.stderr)
@@ -370,7 +370,8 @@ def make_and_register(src, opts, keep_source=True):
     rel = "reels/%s_%s.mp4" % (rid, slug(opts.get("dish") or "pakaan"))
     render(src, os.path.join(ROOT, rel), reveal=opts.get("reveal"), start=opts.get("start", 0.0),
            end=opts.get("end"), hook=opts.get("hook", "Watch it open."),
-           pop=opts.get("pop", "PAKAAN!"), dish=opts.get("dish", ""), price=opts.get("price"))
+           pop=opts.get("pop", "PAKAAN!"), dish=opts.get("dish", ""), price=opts.get("price"),
+           place=opts.get("place", "JAPAN FOOD HUB · SABURTALO"))
     register(reels, rel, opts.get("dish", ""), opts.get("price"), opts.get("title"))
     save_reels(reels)
     print("reels.json に %s として登録しました（次の月・水・金に投稿されます）" % rid)
@@ -422,17 +423,23 @@ def main(argv=None):
     ap.add_argument("--price", help="価格（ラリ）")
     ap.add_argument("--hook", default="Watch it open.", help="冒頭の一言")
     ap.add_argument("--pop", default="PAKAAN!", help="パカーンの瞬間の文字")
+    ap.add_argument("--place", default="JAPAN FOOD HUB · SABURTALO", help="最後の店名（空で消す）")
+    ap.add_argument("--no-text", action="store_true", help="冒頭と最後の文字を入れない（文字入りの素材用）")
     ap.add_argument("--out", help="出力先だけ指定して reels.json には登録しない（試し用）")
     a = ap.parse_args(argv)
 
+    if a.no_text:
+        a.hook = a.place = ""
     if a.inbox:
         return run_inbox()
     if not a.src:
         ap.error("元動画を指定するか --inbox を付けてください")
-    opts = {k: v for k, v in vars(a).items() if v not in (None, "") and k not in ("src", "inbox", "out")}
+    opts = {k: v for k, v in vars(a).items() if v not in (None, "") and k not in ("src", "inbox", "out", "no_text")}
+    opts.setdefault("hook", a.hook)
+    opts.setdefault("place", a.place)
     if a.out:
         render(a.src, a.out, reveal=a.reveal, start=a.start, end=a.end, hook=a.hook, pop=a.pop,
-               dish=a.dish, price=a.price)
+               dish=a.dish, price=a.price, place=a.place)
         return 0
     make_and_register(a.src, opts)
     return 0

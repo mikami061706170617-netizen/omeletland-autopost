@@ -95,8 +95,12 @@ CHORDS = [[53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60], [48, 52, 55, 59]
 BEAT = 0.6  # 100 BPM
 
 
-def synth_bed(total, reveal):
-    """BGM＋効果音をモノラルfloat配列で返す（-1〜1）。"""
+def synth_bed(total, reveal, sizzle_until=0.0):
+    """BGM＋効果音をモノラルfloat配列で返す（-1〜1）。
+
+    sizzle_until > 0 のときは 0〜その秒まで焼き音（ジュージュー）も合成する
+    （写真から作るときは実音が無いため）。
+    """
     n = int(total * SR)
     buf = array.array("f", bytes(4 * n))
     rnd = random.Random(7)
@@ -168,6 +172,20 @@ def synth_bed(total, reveal):
         add(reveal + 0.08 + j * 0.06, 1.2,
             lambda x, q=q: 0.06 * math.exp(-5 * x) * math.sin(two_pi * q * x))
 
+    # ジュージュー（高域ノイズ＋ときどきパチッ）
+    if sizzle_until > 0:
+        prev = 0.0
+        crackle = 0.0
+        for i in range(min(n, int(sizzle_until * SR))):
+            x = i / SR
+            env = min(1, x / 0.3) * min(1, (sizzle_until - x) / 0.4)
+            w = rnd.random() * 2 - 1
+            hp, prev = w - prev, w
+            if rnd.random() < 0.0006:
+                crackle = 0.5 * (rnd.random() + 0.3)
+            crackle *= 0.992
+            buf[i] += env * (0.045 * hp + crackle * (rnd.random() * 2 - 1))
+
     peak = max(1e-9, max(abs(v) for v in buf))
     if peak > 0.95:
         for i in range(n):
@@ -207,8 +225,8 @@ def find_font():
 
 def _text(tmp, name, text, font, size, y, t0, t1, color="white"):
     """drawtext 1個分。文字はファイル経由で渡す（記号のエスケープ事故を防ぐ）。"""
-    # 横幅に収まるよう文字サイズを自動で下げる（太字の平均字幅 ≒ 0.62×サイズ）
-    size = max(28, min(size, int(W * 0.88 / (0.62 * max(1, len(text))))))
+    # 横幅に収まるよう文字サイズを自動で下げる（太字の平均字幅 ≒ 0.72×サイズ。大文字は広いので余裕をみる）
+    size = max(28, min(size, int(W * 0.88 / (0.72 * max(1, len(text))))))
     path = os.path.join(tmp, name + ".txt")
     with open(path, "w", encoding="utf-8") as f:
         f.write(text)
@@ -216,6 +234,39 @@ def _text(tmp, name, text, font, size, y, t0, t1, color="white"):
             ":box=1:boxcolor=black@0.55:boxborderw=18:x=(w-text_w)/2:y={y}"
             ":enable='between(t,{t0:.2f},{t1:.2f})'").format(
                 font=font, path=path, size=size, color=color, y=y, t0=t0, t1=t1)
+
+
+def look_chain(reveal, total, texts, tmp, font, crop=True, sharp=0.7):
+    """色づけ・フラッシュ・文字入れ（動画でも写真でも共通）。"""
+    look = []
+    if crop:
+        look += ["scale=%d:%d:force_original_aspect_ratio=increase" % (W, H), "crop=%d:%d" % (W, H)]
+    look += [
+        # 暖色・彩度・コントラストで「焼きたて」の色に
+        "eq=contrast=1.07:brightness=0.02:saturation=1.25",
+        "colorbalance=rm=0.05:gm=0.01:bm=-0.05:rh=0.03:bh=-0.03",
+        "vibrance=intensity=0.15",
+        "unsharp=5:5:%.2f:5:5:0" % sharp,
+        "vignette=angle=PI/6",
+        # パカーンの瞬間の白フラッシュ
+        "drawbox=x=0:y=0:w=iw:h=ih:color=white@0.45:t=fill:enable='between(t,%.2f,%.2f)'"
+        % (reveal, reveal + 0.07),
+    ]
+    if font:
+        hook, pop, dish, place = texts
+        if hook:
+            look.append(_text(tmp, "hook", hook, font, 66, "h*0.12", 0, min(2.8, reveal - 0.6)))
+        if pop:
+            look.append(_text(tmp, "pop", pop, font, 110, "h*0.40", reveal + 0.05,
+                              reveal + 1.6, color="0xFFD23F"))
+        if dish:
+            look.append(_text(tmp, "dish", dish, font, 56, "h*0.72", max(reveal + 1.7, total - 3.8),
+                              total))
+        if place:
+            look.append(_text(tmp, "place", place, font, 44, "h*0.78", max(reveal + 1.7, total - 3.8),
+                              total))
+    look.append("format=yuv420p")
+    return look
 
 
 def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
@@ -238,33 +289,7 @@ def build_filter(segs, has_audio, reveal, total, texts, tmp, font):
         cat.append("[sv%d][sa%d]" % (i, i))
     parts.append("%sconcat=n=%d:v=1:a=1[cv][ca]" % ("".join(cat), n))
 
-    look = [
-        "scale=%d:%d:force_original_aspect_ratio=increase" % (W, H),
-        "crop=%d:%d" % (W, H),
-        # 暖色・彩度・コントラストで「焼きたて」の色に
-        "eq=contrast=1.07:brightness=0.02:saturation=1.25",
-        "colorbalance=rm=0.05:gm=0.01:bm=-0.05:rh=0.03:bh=-0.03",
-        "vibrance=intensity=0.15",
-        "unsharp=5:5:0.7:5:5:0",
-        "vignette=angle=PI/6",
-        # パカーンの瞬間の白フラッシュ
-        "drawbox=x=0:y=0:w=iw:h=ih:color=white@0.45:t=fill:enable='between(t,%.2f,%.2f)'"
-        % (reveal, reveal + 0.07),
-    ]
-    if font:
-        hook, pop, dish, place = texts
-        if hook:
-            look.append(_text(tmp, "hook", hook, font, 66, "h*0.12", 0, min(2.8, reveal - 0.6)))
-        if pop:
-            look.append(_text(tmp, "pop", pop, font, 110, "h*0.40", reveal + 0.05,
-                              reveal + 1.6, color="0xFFD23F"))
-        if dish:
-            look.append(_text(tmp, "dish", dish, font, 56, "h*0.72", max(reveal + 1.7, total - 3.8),
-                              total))
-        if place:
-            look.append(_text(tmp, "place", place, font, 44, "h*0.78", max(reveal + 1.7, total - 3.8),
-                              total))
-    look.append("format=yuv420p")
+    look = look_chain(reveal, total, texts, tmp, font)
     parts.append("[cv]" + ",".join(look) + "[outv]")
 
     # 実音のジュージューを前に出す（高域を持ち上げて圧縮）
@@ -315,6 +340,63 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
     if size >= 100:
         raise RuntimeError("完成ファイルが %.0fMB あります（GitHubは100MB未満）" % size)
     print("できました: %s（%.1f秒・%.1fMB・パカーンは %.1f 秒目）" % (out, total, size, out_reveal))
+    return total
+
+
+STEP_SEC, HERO_SEC = 2.0, 5.0
+
+
+def render_slides(steps, hero, out, hook="", pop="", dish="", price=None,
+                  place="JAPAN FOOD HUB · SABURTALO"):
+    """写真（動画から切り出した静止画でもよい）からリールを作る。
+
+    steps: 調理の途中の写真（順番どおり）。1枚 2秒、ゆっくりズーム。
+    hero : 完成写真。5秒かけて横に流し、入った瞬間にフラッシュ＋ポン＋キラッ。
+    音は実音が無いので、ジュージュー・BGM・効果音をすべて合成する。
+    """
+    if not shutil.which("ffmpeg"):
+        raise RuntimeError("ffmpeg がありません")
+    reveal = STEP_SEC * len(steps)
+    total = reveal + HERO_SEC
+    frames = int(STEP_SEC * FPS)
+    tmp = tempfile.mkdtemp(prefix="slides_")
+    try:
+        bed = os.path.join(tmp, "bed.wav")
+        write_wav(bed, synth_bed(total + 0.5, reveal, sizzle_until=reveal))
+        cmd = ["ffmpeg", "-y", "-v", "error"]
+        parts = []
+        for i, img in enumerate(steps):
+            cmd += ["-loop", "1", "-framerate", str(FPS), "-t", "%.2f" % STEP_SEC, "-i", img]
+            parts.append(
+                "[{i}:v]scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos,"
+                "crop={w}:{h},setsar=1,zoompan=z='1+0.07*on/{f}':x='iw/2-(iw/zoom/2)'"
+                ":y='ih/2-(ih/zoom/2)':d=1:s={w}x{h}:fps={fps}[p{i}]".format(
+                    i=i, w=W, h=H, f=frames, fps=FPS))
+        k = len(steps)
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-t", "%.2f" % HERO_SEC, "-i", hero]
+        # 完成写真は高さを合わせ、横長なら左→右へゆっくり流す
+        parts.append(
+            "[{k}:v]scale=-2:{h}:flags=lanczos,scale='max(iw,{w})':-2,crop={w}:{h}:"
+            "x='(iw-{w})*t/{d}':y='(ih-{h})/2',setsar=1,fps={fps}[p{k}]".format(
+                k=k, w=W, h=H, d=HERO_SEC, fps=FPS))
+        cmd += ["-i", bed]
+        parts.append("%sconcat=n=%d:v=1:a=0[cv]" % ("".join("[p%d]" % i for i in range(k + 1)), k + 1))
+        dish_line = dish + (" · %s GEL" % price if price else "") if dish else ""
+        font = find_font()
+        look = look_chain(reveal, total, (hook, pop, dish_line, place), tmp, font,
+                          crop=False, sharp=0.4)
+        parts.append("[cv]" + ",".join(look) + "[outv]")
+        parts.append("[%d:a]loudnorm=I=-14:TP=-1.5:LRA=11,volume=3dB,alimiter=limit=0.7:level=false,aresample=%d,"
+                     "aformat=channel_layouts=stereo[outa]" % (k + 1, SR))
+        cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
+                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+                "-r", str(FPS), "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
+                "-movflags", "+faststart", "-t", "%.3f" % total, out]
+        os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+        subprocess.run(cmd, check=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    print("できました: %s（%.1f秒・%.1fMB）" % (out, total, os.path.getsize(out) / 1e6))
     return total
 
 

@@ -6,28 +6,49 @@
     "streams": [
       {
         "codec_name": "aac",
-        "codec_type": "audio"
+        "codec_type": "audio",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
         "codec_name": "h264",
         "codec_type": "video",
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "147075/4903",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       }
     ]
   },
@@ -38,28 +59,49 @@
     "streams": [
       {
         "codec_name": "aac",
-        "codec_type": "audio"
+        "codec_type": "audio",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
         "codec_name": "h264",
         "codec_type": "video",
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "520960/17367",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       }
     ]
   },
@@ -70,28 +112,49 @@
     "streams": [
       {
         "codec_name": "aac",
-        "codec_type": "audio"
+        "codec_type": "audio",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
         "codec_name": "h264",
         "codec_type": "video",
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "324360/10813",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       }
     ]
   },
@@ -102,28 +165,49 @@
     "streams": [
       {
         "codec_name": "aac",
-        "codec_type": "audio"
+        "codec_type": "audio",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
         "codec_name": "h264",
         "codec_type": "video",
         "width": 1080,
-        "height": 1920
+        "height": 1920,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       },
       {
-        "codec_type": "data"
+        "codec_type": "data",
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "start_time": "0.000000"
       }
     ]
   }

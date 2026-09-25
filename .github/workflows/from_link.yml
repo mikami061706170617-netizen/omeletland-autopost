@@ -5,6 +5,7 @@ name: reel from link
 # 元動画はリポジトリに入れない。
 on:
   push:
+    branches-ignore: [main]   # マージしたときに main でもう一度作り直さない
     paths: ["jobs/link.json"]
   workflow_dispatch:
 

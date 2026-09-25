@@ -59,5 +59,15 @@
       "ig_link": "https://www.instagram.com/reel/Dde98rZEdq7/",
       "fb": "2044525549509605"
     }
+  ],
+  "youtube_history": [
+    {
+      "id": "S1",
+      "kind": "short",
+      "date": "2026-09-25",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/4"
+    }
   ]
 }

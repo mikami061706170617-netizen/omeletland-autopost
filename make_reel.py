@@ -53,11 +53,13 @@ FONTS = [
     "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
 ]
 
-ADDRESS = ("Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni St), Saburtalo\n"
-           "6 min from Technical University metro · Open daily 11:00–23:00")
-TAGS = ("#omurice #tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #saburtalo "
-        "#japanesefoodtbilisi #georgia #თბილისი #საბურთალო #ომურაისი #オムライス #トビリシ "
-        "#foodasmr #satisfying")
+ADDRESS = ("📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n"
+           "🚇 6 min from Technical University metro · 🕚 Daily 11:00–23:00")
+TAGS = ("#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia "
+        "#omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs "
+        "#тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #オムライス")
+CTA = ("💬 Would you try it? Tell us in the comments\n"
+       "📌 Save this for your next lunch in Tbilisi · 👯 Tag a friend who loves eggs")
 
 
 # ---------------------------------------------------------------- 時間割
@@ -512,14 +514,14 @@ def render_slides(steps, hero, out, hook="", pop="", dish="", price=None,
 # ---------------------------------------------------------------- reels.json 登録
 
 def caption_for(dish, price):
-    if dish:
-        head = "Watch it open. %s%s.\n\n" % (dish, " — ₾%s" % price if price else "")
-        ka = "უყურე როგორ იხსნება. %s%s.\n\n" % (dish, " — ₾%s" % price if price else "")
-    else:
-        head = "Watch it open. Every omurice is cooked to order.\n\n"
-        ka = "უყურე როგორ იხსნება. ყოველი ომურაისი — შეკვეთისთანავე.\n\n"
+    """1行目で止まってもらう（フック）→ 英・ジョージア・ロシア・日本語 → 保存/タグ付けのお願い → 場所 → タグ。"""
+    p = " — ₾%s" % price if price else ""
+    head = ("Watch till the end 👀🍳\n%s%s — cooked to order, soft and creamy inside.\n\n" % (dish, p)
+            if dish else "Watch till the end 👀🍳\nEvery omurice is cooked to order, soft and creamy inside.\n\n")
+    ka = "ყოველი ომურაისი — შეკვეთისთანავე 🍳\n"
+    ru = "Каждый омурайсу готовим под заказ 🍳\n"
     jp = "パカーン。一皿ずつ、注文が入ってから焼いています。\n\n"
-    return head + ka + jp + ADDRESS + "\n\n" + TAGS
+    return head + ka + ru + jp + CTA + "\n\n" + ADDRESS + "\n\n" + TAGS
 
 
 def next_id(reels):

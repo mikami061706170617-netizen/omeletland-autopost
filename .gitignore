@@ -15,3 +15,6 @@ R1_20seconds_v*.mp4
 inbox_保留/
 # 下見用のコマ見本（from_link.yml が作る。コミットしない）
 preview/
+
+# 写真アプリから送った動画の記録（Macごと）
+inbox/.sent_ids.txt

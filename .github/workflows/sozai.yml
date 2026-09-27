@@ -1,0 +1,44 @@
+name: sozai preview
+
+# Mac の「アップロード.command」が素材置き場（リリース sozai）に動画を送ったあとに動く。
+# 動画ごとのコマ見本（preview/<名前>.jpg・秒数入り）と preview/info.json を main に置く。
+# そのあと毎朝の Claude（ルーティン）がコマ見本を見てパカーンの瞬間を選び、
+# 作業ブランチに jobs/link.json（"to_main": true）を置く → from_link.yml が編集して main に入れる。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reel-from-link
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ffmpeg
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+
+      - name: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LINK_JOB: /tmp/job.json
+        run: |
+          echo '{"url": "sozai", "mode": "preview"}' > /tmp/job.json
+          python3 fetch_link.py
+
+      - name: record
+        if: always()
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -f preview 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "sozai preview $(date -u +%F_%H%M)"
+            for i in 1 2 3; do git pull --rebase origin main && git push origin HEAD:main && exit 0; sleep 5; done
+            exit 1
+          fi

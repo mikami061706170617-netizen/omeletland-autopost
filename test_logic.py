@@ -151,5 +151,21 @@ if os.path.exists(os.path.join(ROOT, "youtube.json")):
               and os.path.getsize(os.path.join(ROOT, p["video"])) < 100e6)
         check("%s %s" % (vid, p["video"]), ok, "%d文字" % len(p["title"]))
 
+print("\n[8] 素材置き場（sozai）")
+import fetch_link as FL
+job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [
+    {"segments": [["a.MOV", 0, 5, 1], ["b.MOV", 3, 4, 0.5]]},
+    {"type": "youtube", "id": "S9", "segments": [["a.MOV", 6, 9, 1]]}]}
+check("使った元動画だけを数える（二重なし）", FL.used_names(job) == ["a.MOV", "b.MOV"], str(FL.used_names(job)))
+check("下見ジョブは何も消さない", FL.used_names({"url": "sozai", "mode": "preview"}) == [])
+import py_compile
+try:
+    py_compile.compile(os.path.join(ROOT, "upload_inbox.py"), doraise=True)
+    check("upload_inbox.py の文法", True)
+except py_compile.PyCompileError as e:
+    check("upload_inbox.py の文法", False, str(e))
+ign = open(os.path.join(ROOT, ".gitignore"), encoding="utf-8").read()
+check("送った記録（.sent_ids.txt）はコミットしない", "inbox/.sent_ids.txt" in ign)
+
 print("\n" + ("すべて通過しました。" if not fails else "失敗: " + ", ".join(fails)))
 sys.exit(1 if fails else 0)

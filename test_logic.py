@@ -151,6 +151,32 @@ if os.path.exists(os.path.join(ROOT, "youtube.json")):
               and os.path.getsize(os.path.join(ROOT, p["video"])) < 100e6)
         check("%s %s" % (vid, p["video"]), ok, "%d文字" % len(p["title"]))
 
+yq2 = {"order": ["S1"], "posts": {"S1": {"id": "S1", "kind": "short", "video": "v", "reel": "R3"}}}
+st2 = {"reels_history": [{"id": "R1"}, {"id": "R3"}, {"id": "R2"}],
+       "youtube_history": [{"id": "S1", "kind": "short", "date": "2026-09-25"}]}
+Y.load = lambda name, default=None: {"posts": {
+    "R1": {"title": "a", "video": "reels/R1.mp4", "no_youtube": True},
+    "R2": {"title": "b", "video": "reels/R2.mp4"},
+    "R3": {"title": "c", "video": "reels/R3.mp4"}}}
+rs = Y.reel_short(yq2, st2)
+check("ショートを出し切ったら、インスタのリールを YouTube にも出す（R1は除外・R3は出し済み）",
+      (rs or {}).get("id") == "R2", str(rs and rs["id"]))
+check("そのタイトルは100字以内で #shorts つき", rs and len(rs["title"]) <= 100 and "#shorts" in rs["title"])
+st2["youtube_history"].append({"id": "R2", "kind": "short", "date": "2026-09-26"})
+check("出したリールは二度出さない", Y.reel_short(yq2, st2) is None)
+
+import shutil as _sh
+import subprocess as _sp
+if _sh.which("ffprobe"):
+    for d in ("reels", "youtube"):
+        for f in sorted(os.listdir(os.path.join(ROOT, d))):
+            if f.endswith(".mp4"):
+                trc = _sp.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries",
+                               "stream=color_transfer", "-of", "csv=p=0", os.path.join(ROOT, d, f)],
+                              capture_output=True, text=True).stdout.strip()
+                check("%s/%s は SDR（HDRの印なし＝インスタで真っ暗にならない）" % (d, f),
+                      trc in ("bt709", "", "unknown"), trc)
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

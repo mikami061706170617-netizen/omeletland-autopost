@@ -37,6 +37,9 @@ import tempfile
 ROOT = os.path.dirname(os.path.abspath(__file__))
 INBOX = os.path.join(ROOT, "inbox")
 VIDEO_EXT = (".mov", ".mp4", ".m4v")
+# iPhone の HDR（HLG・bt2020）の印が残ると、Instagram で真っ暗・何も映らない表示になる。
+# 中身は普通の 8bit 映像として作っているので、出力には必ず SDR（bt709）の印を付ける。
+SDR = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"]
 W, H, FPS, SR = 1080, 1920, 30, 48000
 
 FAST = 1.6          # 焼いている前半の早送り倍率
@@ -347,7 +350,7 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
         os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
         cmd = ["ffmpeg", "-y", "-v", "error", "-i", src, "-i", bed,
                "-filter_complex", fc, "-map", "[outv]", "-map", "[outa]",
-               "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+               "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20", *SDR,
                "-maxrate", "8M", "-bufsize", "16M", "-r", str(FPS),
                "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
                "-movflags", "+faststart", "-t", "%.3f" % total, out]
@@ -439,7 +442,7 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
                      "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.7:level=false,"
                      "aresample=%d,aformat=channel_layouts=stereo[outa]" % (wts, SR))
         cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
-                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20", *SDR,
                 # 長い動画でも GitHub の 100MB 未満に収まるよう上限を決める
                 "-maxrate", "%.1fM" % min(8.0, 600.0 / total), "-bufsize", "16M", "-r", str(FPS),
                 "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
@@ -500,7 +503,7 @@ def render_slides(steps, hero, out, hook="", pop="", dish="", price=None,
         parts.append("[%d:a]loudnorm=I=-14:TP=-1.5:LRA=11,volume=3dB,alimiter=limit=0.7:level=false,aresample=%d,"
                      "aformat=channel_layouts=stereo[outa]" % (k + 1, SR))
         cmd += ["-filter_complex", ";".join(parts), "-map", "[outv]", "-map", "[outa]",
-                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20",
+                "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20", *SDR,
                 "-r", str(FPS), "-c:a", "aac", "-b:a", "160k", "-ar", str(SR),
                 "-movflags", "+faststart", "-t", "%.3f" % total, out]
         os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)

@@ -59,6 +59,48 @@ def pick(queue, state, kind):
     return None
 
 
+REEL_DESC = """{hook}
+ジョージア・トビリシの日本人オムライス屋の厨房から。最後まで見てね。
+
+━━━━━━━━━━
+📍 お店：Omelet Land Tbilisi（Japan Food Hub 内）
+ジョージア・トビリシ、サブルタロ地区 / 毎日 11:00–23:00
+Instagram：https://www.instagram.com/omeletland.tbilisi/
+━━━━━━━━━━
+🔔 チャンネル登録で、海外オムライス屋の毎日をお届けします
+💬 コメントで「食べたいメニュー」を教えてください。作ります！
+
+#オムライス #半熟 #パカーン
+BGM：オリジナル"""
+REEL_TITLES = ["とろっと半熟…パカーンの瞬間がたまらない #shorts",
+               "この半熟、ずるい。ナイフ一本でとろ〜り #shorts",
+               "海外で毎日焼いてます。半熟オムライスの開く瞬間 #shorts",
+               "音まで美味しい…ジュワッと半熟オムライス #shorts"]
+REEL_TAGS = ["オムライス", "半熟オムライス", "パカーン", "ジョージア", "トビリシ", "海外生活",
+             "海外飲食店", "日本人", "料理", "ASMR", "omurice", "tbilisi", "georgia", "shorts"]
+
+
+def reel_short(queue, state):
+    """youtube.json のショートを出し切ったら、インスタに出したリールを YouTube ショートにも出す。
+    YouTube 用に作ったショート（"reel" で元のリールを書いてあるもの）と重ならないようにする。"""
+    try:
+        reels = load("reels.json")
+    except (OSError, ValueError):
+        return None
+    linked = {p.get("reel") for p in queue.get("posts", {}).values()}
+    done = {h["id"] for h in state.get("youtube_history", [])}
+    on_ig = [h["id"] for h in state.get("reels_history", [])]
+    for rid in on_ig:
+        p = reels["posts"].get(rid)
+        if not p or rid in linked or rid in done or p.get("no_youtube"):
+            continue
+        return {"id": rid, "kind": "short", "video": p["video"],
+                "title": REEL_TITLES[len(done) % len(REEL_TITLES)],
+                "description": REEL_DESC.format(hook="ナイフを入れた瞬間、とろ〜り。何度見ても気持ちいい半熟オムライス。"),
+                "tags": REEL_TAGS}
+    return None
+
+
 def video_url(post):
     repo = os.environ.get("GITHUB_REPOSITORY", "")
     ref = os.environ.get("GITHUB_REF_NAME", "main")
@@ -139,6 +181,9 @@ def main():
 
     todo = []
     s = pick(queue, state, "short")
+    if not s and not any(h.get("date") == today_str() and h.get("kind") == "short"
+                         for h in state.get("youtube_history", [])):
+        s = reel_short(queue, state)
     if s:
         todo.append(s)
     if now().weekday() == LONG_WEEKDAY or os.environ.get("FORCE_LONG", "").lower() in ("1", "true"):

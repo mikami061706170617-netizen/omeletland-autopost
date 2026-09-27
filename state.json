@@ -106,6 +106,22 @@
       "mode": "notify",
       "youtube": "",
       "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/5"
+    },
+    {
+      "id": "S3",
+      "kind": "short",
+      "date": "2026-09-27",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/9"
+    },
+    {
+      "id": "L1",
+      "kind": "long",
+      "date": "2026-09-27",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/10"
     }
   ]
 }

@@ -54,8 +54,67 @@ def save(op, url, referer, dest_dir):
     return path, None
 
 
+SOZAI = "sozai"      # Mac の「アップロード.command」が動画を送るリリース（素材置き場）
+
+
+def gh(*args, check=True):
+    p = subprocess.run(["gh"] + list(args), capture_output=True, text=True)
+    if check and p.returncode != 0:
+        raise RuntimeError(p.stderr.strip()[-400:])
+    return p.stdout
+
+
+def sozai_assets():
+    """素材置き場にある動画の名前（無ければ空）。"""
+    out = gh("release", "view", SOZAI, "--json", "assets", "-q", ".assets[].name", check=False)
+    return [n for n in out.split() if n.lower().endswith(VIDEO_EXT)]
+
+
+def download_sozai(names=None):
+    """素材置き場の動画を落とす。names を渡せばその動画だけ。"""
+    os.makedirs(WORK, exist_ok=True)
+    have = sozai_assets()
+    for n in (names or have):
+        if n not in have:
+            raise RuntimeError("素材置き場に %s がありません（%s）" % (n, ", ".join(have)))
+        if not os.path.exists(os.path.join(WORK, n)):
+            gh("release", "download", SOZAI, "-p", n, "-D", WORK, "--clobber")
+            print("取得:", n)
+    return sorted(os.path.join(WORK, n) for n in (names or have))
+
+
+def delete_sozai(names):
+    """使い終わった動画を素材置き場から消す（Public なので残さない）。コマ見本も消す。"""
+    for n in names:
+        gh("release", "delete-asset", SOZAI, n, "-y", check=False)
+        stem = os.path.splitext(n)[0]
+        prev = os.path.join(ROOT, "preview")
+        if os.path.isdir(prev):
+            for f in os.listdir(prev):
+                if f == stem + ".jpg" or ("_%s_" % stem) in f:
+                    os.remove(os.path.join(prev, f))
+        info = os.path.join(prev, "info.json")
+        if os.path.exists(info):
+            with open(info, encoding="utf-8") as f:
+                d = json.load(f)
+            d.pop(n, None)
+            with open(info, "w", encoding="utf-8") as f:
+                json.dump(d, f, ensure_ascii=False, indent=2)
+        print("素材置き場から消しました:", n)
+
+
+def used_names(job):
+    """ジョブで使った元動画の名前。"""
+    specs = job.get("items") or job.get("youtube") or ([job["montage"]] if "montage" in job else [])
+    names = {seg[0] for sp in specs for seg in sp.get("segments", [])}
+    names |= set(job.get("clips", {}))
+    return sorted(names)
+
+
 def download(url):
     """ギガファイル便のページから動画を全部落とす。zip なら展開する。"""
+    if url == SOZAI:
+        return download_sozai()
     os.makedirs(WORK, exist_ok=True)
     op = opener()
     page = op.open(url, timeout=60).read().decode("utf-8", "replace")
@@ -226,8 +285,12 @@ def youtube(vids, spec):
 
 
 def main():
-    job = json.load(open(os.path.join(ROOT, "jobs", "link.json"), encoding="utf-8"))
-    vids = download(job["url"])
+    path = os.environ.get("LINK_JOB") or os.path.join(ROOT, "jobs", "link.json")
+    job = json.load(open(path, encoding="utf-8"))
+    if job["url"] == SOZAI and job.get("mode", "preview") != "preview":
+        vids = download_sozai(used_names(job))       # 使う動画だけ落とす
+    else:
+        vids = download(job["url"])
     print("動画:", [os.path.basename(v) for v in vids])
     SHEETS.extend(job.get("sheets", []))
     if job.get("mode", "preview") == "preview":
@@ -242,6 +305,8 @@ def main():
             (youtube if spec.get("type") == "youtube" else montage)(vids, spec)
     else:
         render(vids, job.get("clips", {}))
+    if job["url"] == SOZAI and job.get("mode", "preview") != "preview":
+        delete_sozai(used_names(job) + job.get("discard", []))
     return 0
 
 

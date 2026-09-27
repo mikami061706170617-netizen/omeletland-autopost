@@ -3,6 +3,8 @@ name: reel from link
 # jobs/link.json を push すると、共有リンク（ギガファイル便など）の動画を取り込んで
 # 下見（preview/ のコマ見本）か、リール化（reels/ と reels.json）をする。
 # 元動画はリポジトリに入れない。
+# "url": "sozai" なら素材置き場（リリース）の動画を使い、使い終わったら素材置き場から消す。
+# "to_main": true のジョブ（毎朝の Claude が置く）は、できたものをそのまま main に入れる。
 on:
   push:
     branches-ignore: [main]   # マージしたときに main でもう一度作り直さない
@@ -26,6 +28,8 @@ jobs:
         run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
 
       - name: fetch and edit
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python3 fetch_link.py
 
       - name: record
@@ -38,4 +42,12 @@ jobs:
             git commit -m "reel from link $(date -u +%F_%H%M)"
             git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+          # "to_main": true のジョブ（毎朝の Claude が置く）は、できたものをそのまま main に入れる
+          if python3 -c "import json,sys; sys.exit(0 if json.load(open('jobs/link.json')).get('to_main') else 1)"; then
+            for i in 1 2 3; do
+              git fetch origin main && git rebase origin/main && git push origin HEAD:main && exit 0
+              sleep 5
+            done
+            exit 1
           fi

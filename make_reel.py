@@ -457,6 +457,49 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
     return total
 
 
+def photo_segment(img, out, sec, label="", center=(0.5, 0.5), frac=1.0, zoom=1.08, pan=0):
+    """写真1枚から 1080×1920 の短い動画を作る（render_montage の区間に使う）。
+
+    pan=1 / -1 … 横長の写真を左→右 / 右→左 にゆっくり流す（縦の窓で皿全体を見せる）
+    pan=0      … center（0〜1）を中心に、写真の高さの frac 倍の縦長の窓で切り出し、zoom 倍までゆっくり寄る
+    label      … 上の方に出す料理名（₾ はフォントに無いので GEL と書く）
+    """
+    iw, ih = [int(v) for v in subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "stream=width,height", "-of", "csv=p=0", img],
+        capture_output=True, text=True, check=True).stdout.split(",")[:2]]
+    fr = int(round(sec * FPS))
+    if pan:
+        xs = "(iw-ow)*t/%.3f" % sec if pan > 0 else "(iw-ow)*(1-t/%.3f)" % sec
+        vf = "scale=-2:2160,crop=w=ih*9/16:h=ih:x='%s':y=0,scale=%d:%d" % (xs, W, H)
+    else:
+        h = min(ih, ih * frac)
+        w = h * 9 / 16
+        if w > iw:
+            w, h = iw, iw * 16 / 9
+        x = min(max(0, center[0] * iw - w / 2), iw - w)
+        y = min(max(0, center[1] * ih - h / 2), ih - h)
+        vf = ("crop=%d:%d:%d:%d,scale=%d:%d,zoompan=z='1+%.4f*on/%d':x='iw/2-(iw/zoom/2)':"
+              "y='ih/2-(ih/zoom/2)':d=%d:s=%dx%d:fps=%d"
+              % (w, h, x, y, W * 2, H * 2, zoom - 1, fr, fr, W, H, FPS))
+    vf += ",setsar=1"
+    tmp = None
+    if label:
+        tmp = tempfile.mkdtemp(prefix="photo_")
+        tf = os.path.join(tmp, "label.txt")
+        with open(tf, "w", encoding="utf-8") as f:
+            f.write(label)
+        vf += (",drawtext=fontfile='%s':textfile='%s':fontsize=52:fontcolor=white:x=(w-tw)/2:y=h*0.24:"
+               "box=1:boxcolor=black@0.5:boxborderw=20:alpha='min(1,t/0.3)'" % (find_font(), tf))
+    try:
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-loop", "1", "-i", img, "-vf", vf,
+                        "-t", "%.3f" % sec, "-r", str(FPS), "-pix_fmt", "yuv420p",
+                        "-c:v", "libx264", "-crf", "16", *SDR, out], check=True)
+    finally:
+        if tmp:
+            shutil.rmtree(tmp, ignore_errors=True)
+    return (out, 0.0, sec, 1.0)
+
+
 STEP_SEC, HERO_SEC = 2.0, 5.0
 
 

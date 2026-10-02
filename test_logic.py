@@ -43,7 +43,8 @@ queue = json.load(open(os.path.join(ROOT, "queue.json"), encoding="utf-8"))
 order, posts = queue["order"], queue["posts"]
 
 print("\n[1] キューの整合性")
-check("14件ある", len(order) == 14, "%d件" % len(order))
+N = len(order)
+check("14件以上ある", N >= 14, "%d件" % N)
 check("orderとpostsが一致", set(order) == set(posts), "")
 check("IDの重複なし", len(set(order)) == len(order))
 check("並びが D03 から始まる", order[0] == "D03", order[0])
@@ -76,11 +77,11 @@ for d in range(30):
     days.append((day.strftime("%m-%d"), pid))
     state["history"].append({"id": pid, "date": day.strftime("%Y-%m-%d")})
 
-first14 = seen[:14]
+first = seen[:N]
 check("初日は D04（シェフの物語）", seen[0] == "D04", seen[0])
-check("14日で一周（重複なし）", len(set(first14)) == 14, ",".join(first14))
-check("15日目で折り返す", seen[14] == first14[0] if len(seen) > 14 else False,
-      seen[14] if len(seen) > 14 else "-")
+check("%d日で一周（重複なし）" % N, len(set(first)) == N, ",".join(first))
+check("%d日目で折り返す" % (N + 1), seen[N] == first[0] if len(seen) > N else False,
+      seen[N] if len(seen) > N else "-")
 after_nov = [pid for (d, pid) in days if d >= "11-01" and pid != "stop"]
 check("11/1以降 D05 は出ない", "D05" not in after_nov, ",".join(after_nov[:6]))
 

@@ -178,6 +178,19 @@ if _sh.which("ffprobe"):
                 check("%s/%s は SDR（HDRの印なし＝インスタで真っ暗にならない）" % (d, f),
                       trc in ("bt709", "", "unknown"), trc)
 
+if _sh.which("ffmpeg"):
+    import tempfile as _tf
+    _d = _tf.mkdtemp()
+    _img = os.path.join(_d, "p.jpg")
+    _sp.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "color=c=orange:s=400x300", "-frames:v", "1", _img], check=True)
+    for _k, _kw in enumerate([dict(pan=1), dict(center=(0.7, 0.5), frac=0.8)]):
+        _o = os.path.join(_d, "o%d.mp4" % _k)
+        M.photo_segment(_img, _o, 1.0, "No.01", **_kw)
+        _wh = _sp.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries", "stream=width,height,color_transfer",
+                       "-of", "csv=p=0", _o], capture_output=True, text=True).stdout.strip()
+        check("写真から縦動画を作る（%s）" % ("横に流す" if _k == 0 else "寄る"), _wh == "1080,1920,bt709", _wh)
+    _sh.rmtree(_d, ignore_errors=True)
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

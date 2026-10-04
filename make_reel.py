@@ -57,7 +57,7 @@ FONTS = [
 ]
 
 ADDRESS = ("📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n"
-           "🚇 6 min from Technical University metro · 🕚 Daily 11:00–23:00")
+           "🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00")
 TAGS = ("#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia "
         "#omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs "
         "#тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #オムライス")

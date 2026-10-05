@@ -24,7 +24,8 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           PAGE_TOKEN: ${{ secrets.PAGE_TOKEN }}
-          IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID }}
+          # 場所タグ: 店の Facebook ページ（住所 1 Davit Gamrekeli St＝Japan Food Hub が入っている）を使う
+          IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID || secrets.FB_PAGE_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: python3 post_reel.py
 

@@ -191,6 +191,18 @@ if _sh.which("ffmpeg"):
         check("写真から縦動画を作る（%s）" % ("横に流す" if _k == 0 else "寄る"), _wh == "1080,1920,bt709", _wh)
     _sh.rmtree(_d, ignore_errors=True)
 
+if _sh.which("ffmpeg"):
+    import add_reel as AR
+    _d = _tf.mkdtemp()
+    _src, _dst = os.path.join(_d, "in.mov"), os.path.join(_d, "out.mp4")
+    _sp.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "testsrc=s=1920x1080:d=2",
+             "-color_trc", "arib-std-b67", "-pix_fmt", "yuv420p", _src], check=True)
+    AR.normalize(_src, _dst)
+    _w, _h, _trc, _dur, _au = AR.info(_dst)
+    check("できあがった動画を縦1080×1920・SDR・音ありに直す（add_reel）",
+          (_w, _h, _trc, _au) == (1080, 1920, "bt709", True), "%dx%d %s 音%s" % (_w, _h, _trc, _au))
+    _sh.rmtree(_d, ignore_errors=True)
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

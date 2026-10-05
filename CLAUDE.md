@@ -3,6 +3,8 @@
 Omelet Land Tbilisi の Instagram / Facebook 自動投稿一式。
 **AI CAD（AICAD）とは全く別の仕事です。** このフォルダの外は触らないこと。
 
+続きの作業をするときは、この約束の次に `HANDOFF.md`（引き継ぎ書）を読むこと。
+
 # このリポジトリを触るときの約束
 
 - **依存パッケージを増やさない。** Python標準ライブラリのみ。pipは使わない。

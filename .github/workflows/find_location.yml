@@ -1,0 +1,19 @@
+name: find location
+
+# Instagram の場所タグ用に、Facebook の場所ページ ID を探す（手動で1回）。ログを見るだけで何も変えない。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: find
+        env:
+          PAGE_TOKEN: ${{ secrets.PAGE_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+        run: python3 find_location.py

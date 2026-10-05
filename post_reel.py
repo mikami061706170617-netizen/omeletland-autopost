@@ -102,7 +102,15 @@ def publish_instagram(ig_user, token, url, caption, media_type="REELS"):
         loc = os.environ.get("IG_LOCATION_ID")
         if loc:
             params["location_id"] = loc
-    container = api("%s/media" % ig_user, params, "POST")["id"]
+    try:
+        container = api("%s/media" % ig_user, params, "POST")["id"]
+    except RuntimeError as e:
+        if "location_id" not in params:
+            raise
+        # 場所が使えなくても投稿は止めない（場所なしでもう一度）
+        print("場所タグが使えなかったので、場所なしで出します: %s" % str(e)[:200])
+        params.pop("location_id")
+        container = api("%s/media" % ig_user, params, "POST")["id"]
 
     waited = 0
     while waited < POLL_SECONDS:

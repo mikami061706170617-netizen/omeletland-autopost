@@ -107,7 +107,15 @@ def post_instagram(ig_user, token, img, caption, location_id):
     params = {"image_url": img, "caption": caption, "access_token": token}
     if location_id:
         params["location_id"] = location_id
-    container = api("%s/media" % ig_user, params, "POST")["id"]
+    try:
+        container = api("%s/media" % ig_user, params, "POST")["id"]
+    except RuntimeError as e:
+        if not location_id:
+            raise
+        # 場所が使えなくても投稿は止めない（場所なしでもう一度）
+        print("場所タグが使えなかったので、場所なしで出します: %s" % str(e)[:200])
+        params.pop("location_id")
+        container = api("%s/media" % ig_user, params, "POST")["id"]
 
     for _ in range(30):
         info = api(container, {"fields": "status_code,status", "access_token": token})

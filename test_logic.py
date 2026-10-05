@@ -223,6 +223,23 @@ _rl, _pn = SC.stock({"order": ["R1", "R2", "R3"]}, {"order": ["D1", "D2"]},
 check("在庫を数える（出していないリール・写真）", (_rl, _pn) == (["R2", "R3"], ["D2"]), "%s %s" % (_rl, _pn))
 check("在庫の知らせの文に残り日数が入る", "2本" in SC.message(_rl, _pn))
 
+_calls = []
+def _fake_api(path, params, method="GET"):
+    _calls.append(dict(params))
+    if path.endswith("/media") and "location_id" in params:
+        raise RuntimeError("(#100) Invalid location")
+    if path.endswith("/media"):
+        return {"id": "c1"}
+    if path.endswith("media_publish"):
+        return {"id": "m1"}
+    return {"status_code": "FINISHED", "permalink": "https://instagram.com/p/x"}
+_real_api, P.api = P.api, _fake_api
+try:
+    _mid = P.post_instagram("ig", "tok", "https://img", "cap", "123")[0]
+    check("場所タグが断られても、場所なしで投稿する", _mid == "m1" and "location_id" not in _calls[1], str(_mid))
+finally:
+    P.api = _real_api
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

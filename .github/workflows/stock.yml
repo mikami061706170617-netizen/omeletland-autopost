@@ -1,0 +1,21 @@
+name: stock check
+
+# 毎朝、投稿の在庫（リール・まだ出していない写真）を数えて、3日分を切ったら Issue で知らせる。
+on:
+  schedule:
+    - cron: "50 5 * * *"       # 05:50 UTC = 09:50 トビリシ
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 stock_check.py

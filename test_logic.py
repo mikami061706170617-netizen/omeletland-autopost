@@ -177,6 +177,10 @@ if _sh.which("ffprobe"):
                               capture_output=True, text=True).stdout.strip()
                 check("%s/%s は SDR（HDRの印なし＝インスタで真っ暗にならない）" % (d, f),
                       trc in ("bt709", "", "unknown"), trc)
+                rot = _sp.run(["ffprobe", "-v", "error", "-select_streams", "v", "-show_entries",
+                               "stream_side_data=rotation", "-of", "csv=p=0", os.path.join(ROOT, d, f)],
+                              capture_output=True, text=True).stdout.strip()
+                check("%s/%s は回転の印なし（横倒しにならない）" % (d, f), rot in ("", "0"), rot)
 
 if _sh.which("ffmpeg"):
     import tempfile as _tf
@@ -202,6 +206,22 @@ if _sh.which("ffmpeg"):
     check("できあがった動画を縦1080×1920・SDR・音ありに直す（add_reel）",
           (_w, _h, _trc, _au) == (1080, 1920, "bt709", True), "%dx%d %s 音%s" % (_w, _h, _trc, _au))
     _sh.rmtree(_d, ignore_errors=True)
+
+print("\n[7b] 1日2回の写真と在庫の知らせ")
+os.environ["MAX_PER_DAY"] = "2"
+P.today_str = lambda: "2026-10-06"
+st = {"history": [{"id": "D04", "date": "2026-10-06"}]}
+pid2, stop2 = P.pick(queue, st)
+check("2回目の投稿は出る（1日2回）", pid2 is not None and pid2 != "D04", str(pid2 or stop2))
+st["history"].append({"id": pid2, "date": "2026-10-06"})
+check("3回目は出さない", P.pick(queue, st)[0] is None)
+os.environ.pop("MAX_PER_DAY")
+check("ふだん（設定なし）は1日1回", P.pick(queue, {"history": [{"id": "D04", "date": "2026-10-06"}]})[0] is None)
+import stock_check as SC
+_rl, _pn = SC.stock({"order": ["R1", "R2", "R3"]}, {"order": ["D1", "D2"]},
+                    {"reels_history": [{"id": "R1"}], "history": [{"id": "D1"}]})
+check("在庫を数える（出していないリール・写真）", (_rl, _pn) == (["R2", "R3"], ["D2"]), "%s %s" % (_rl, _pn))
+check("在庫の知らせの文に残り日数が入る", "2本" in SC.message(_rl, _pn))
 
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL

@@ -73,8 +73,9 @@ def pick(queue, state):
     history = state.get("history", [])
     today = today_str()
 
-    if any(h.get("date") == today for h in history):
-        return None, "今日はすでに投稿済み（二重投稿ガード）"
+    per_day = max(1, int(os.environ.get("MAX_PER_DAY", "1") or 1))
+    if sum(1 for h in history if h.get("date") == today) >= per_day:
+        return None, "今日はすでに %d 回投稿済み（二重投稿ガード）" % per_day
 
     if not history:
         start = 0

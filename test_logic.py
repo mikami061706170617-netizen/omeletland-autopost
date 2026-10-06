@@ -240,6 +240,28 @@ try:
 finally:
     P.api = _real_api
 
+import re as _re
+_jp = _re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
+_bad = [k for f in ("reels.json", "queue.json")
+        for k, p in json.load(open(os.path.join(ROOT, f), encoding="utf-8"))["posts"].items() if _jp.search(p["caption"])]
+check("インスタのキャプションに日本語を入れない", not _bad and not _jp.search(M.caption_for("No.01", 38)), ",".join(_bad))
+import datetime as _dt
+class _FakeDT(_dt.datetime):
+    _t = None
+    @classmethod
+    def now(cls, tz=None):
+        return cls._t
+import importlib.util as _ilu
+for _name in ("post_reel", "post"):
+    _spec = _ilu.spec_from_file_location("_fresh_" + _name, os.path.join(ROOT, _name + ".py"))
+    _mod = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)          # ほかの検査で差し替えていない、元の today_str を使う
+    _mod.datetime = _FakeDT
+    _FakeDT._t = _dt.datetime(2026, 10, 4, 0, 57, tzinfo=_mod.TBILISI)
+    check("%s: 夜中に遅れて動いても前の日の分" % _name, _mod.today_str() == "2026-10-03", _mod.today_str())
+    _FakeDT._t = _dt.datetime(2026, 10, 4, 19, 37, tzinfo=_mod.TBILISI)
+    check("%s: ふだんの時刻はその日の分" % _name, _mod.today_str() == "2026-10-04", _mod.today_str())
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

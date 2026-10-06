@@ -20,7 +20,8 @@ VERSIONS = ["v23.0", "v22.0", "v21.0", ""]
 
 
 def today_str():
-    return datetime.now(TBILISI).strftime("%Y-%m-%d")
+    # 「投稿の日」は朝6時に切り替わる。GitHub の予約が数時間遅れて夜中0時を過ぎても、前の日の分として数える
+    return (datetime.now(TBILISI) - timedelta(hours=6)).strftime("%Y-%m-%d")
 
 
 def load_json(name, default=None):

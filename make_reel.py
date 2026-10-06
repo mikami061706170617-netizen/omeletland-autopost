@@ -60,7 +60,7 @@ ADDRESS = ("📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Sa
            "🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00")
 TAGS = ("#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia "
         "#omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs "
-        "#тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #オムライス")
+        "#тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი")
 CTA = ("💬 Would you try it? Tell us in the comments\n"
        "📌 Save this for your next lunch in Tbilisi · 👯 Tag a friend who loves eggs")
 
@@ -560,14 +560,14 @@ def render_slides(steps, hero, out, hook="", pop="", dish="", price=None,
 # ---------------------------------------------------------------- reels.json 登録
 
 def caption_for(dish, price):
-    """1行目で止まってもらう（フック）→ 英・ジョージア・ロシア・日本語 → 保存/タグ付けのお願い → 場所 → タグ。"""
+    """1行目で止まってもらう（フック）→ 英・ジョージア・ロシア語 → 保存/タグ付けのお願い → 場所 → タグ。
+    インスタは地元・ロシア語圏・英語圏向けなので日本語は入れない（日本語は YouTube 側だけ）。"""
     p = " — ₾%s" % price if price else ""
     head = ("Watch till the end 👀🍳\n%s%s — cooked to order, soft and creamy inside.\n\n" % (dish, p)
             if dish else "Watch till the end 👀🍳\nEvery omurice is cooked to order, soft and creamy inside.\n\n")
     ka = "ყოველი ომურაისი — შეკვეთისთანავე 🍳\n"
-    ru = "Каждый омурайсу готовим под заказ 🍳\n"
-    jp = "パカーン。一皿ずつ、注文が入ってから焼いています。\n\n"
-    return head + ka + ru + jp + CTA + "\n\n" + ADDRESS + "\n\n" + TAGS
+    ru = "Каждый омурайсу готовим под заказ 🍳\n\n"
+    return head + ka + ru + CTA + "\n\n" + ADDRESS + "\n\n" + TAGS
 
 
 def next_id(reels):

@@ -262,6 +262,20 @@ for _name in ("post_reel", "post"):
     _FakeDT._t = _dt.datetime(2026, 10, 4, 19, 37, tzinfo=_mod.TBILISI)
     check("%s: ふだんの時刻はその日の分" % _name, _mod.today_str() == "2026-10-04", _mod.today_str())
 
+import promo as PM
+_pr = {"until": "2026-10-31", "marker": "nigiri FREE", "text": "🎁 nigiri FREE"}
+_c = "Hook line\n\nBody\n\n#tag"
+check("期間中はお知らせが1段落目の後ろに入る", PM.apply(_c, "2026-10-07", _pr) == "Hook line\n\n🎁 nigiri FREE\n\nBody\n\n#tag")
+check("期間が過ぎたら入らない", PM.apply(_c, "2026-11-01", _pr) == _c)
+check("クーポンの投稿そのものには二重に入れない", PM.apply("x nigiri FREE\n\ny", "2026-10-07", _pr) == "x nigiri FREE\n\ny")
+check("2200字を超えるなら入れない", PM.apply("a" * 2195, "2026-10-07", _pr) == "a" * 2195)
+_real_promo = PM.load()
+for f in ("reels.json", "queue.json"):
+    for k, p in json.load(open(os.path.join(ROOT, f), encoding="utf-8"))["posts"].items():
+        _out = PM.apply(p["caption"], "2026-10-07", _real_promo)
+        if len(_out) > 2200 or _out.count("#") > 30:
+            check("%s お知らせ込みでも 2200字・タグ30個以内" % k, False, "%d字" % len(_out))
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

@@ -8,6 +8,8 @@
 import json
 import os
 import sys
+
+import promo
 import time
 import urllib.error
 import urllib.parse
@@ -167,6 +169,7 @@ def main():
         print("Secrets が足りません: %s" % ", ".join(missing), file=sys.stderr)
         return 1
 
+    post = dict(post, caption=promo.apply(post["caption"], today_str()))   # 期間限定のお知らせ（promo.json）
     img = image_url_for(post)
     print("今日の回: %s — %s" % (pid, post["title"]))
     print("画像URL : %s" % img)

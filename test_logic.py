@@ -77,11 +77,17 @@ for d in range(max(30, N + 2)):   # キューが30件を超えても一周＋折
     days.append((day.strftime("%m-%d"), pid))
     state["history"].append({"id": pid, "date": day.strftime("%Y-%m-%d")})
 
-first = seen[:N]
+first = []                       # 最初に同じ回が出るまでを「一周」とみなす
+for pid in seen:
+    if pid in first:
+        break
+    first.append(pid)
+missing = [k for k in queue["order"] if k not in first]   # 一周で出なかった回（期限切れのはず）
 check("初日は D04（シェフの物語）", seen[0] == "D04", seen[0])
-check("%d日で一周（重複なし）" % N, len(set(first)) == N, ",".join(first))
-check("%d日目で折り返す" % (N + 1), seen[N] == first[0] if len(seen) > N else False,
-      seen[N] if len(seen) > N else "-")
+check("一周で全件（重複なし・抜けは期限切れだけ）",
+      all(queue["posts"][k].get("expiry") for k in missing), ",".join(missing) or "抜けなし")
+check("一周したら折り返す", len(seen) > len(first) and seen[len(first)] == first[0],
+      seen[len(first)] if len(seen) > len(first) else "-")
 after_nov = [pid for (d, pid) in days if d >= "11-01" and pid != "stop"]
 check("11/1以降 D05 は出ない", "D05" not in after_nov, ",".join(after_nov[:6]))
 

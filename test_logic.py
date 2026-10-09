@@ -244,6 +244,9 @@ import re as _re
 _jp = _re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 _bad = [k for f in ("reels.json", "queue.json")
         for k, p in json.load(open(os.path.join(ROOT, f), encoding="utf-8"))["posts"].items() if _jp.search(p["caption"])]
+_notag = [k for f in ("reels.json", "queue.json")
+          for k, p in json.load(open(os.path.join(ROOT, f), encoding="utf-8"))["posts"].items() if "#" not in p["caption"]]
+check("どのキャプションにもハッシュタグがある", not _notag, ",".join(_notag))
 check("インスタのキャプションに日本語を入れない", not _bad and not _jp.search(M.caption_for("No.01", 38)), ",".join(_bad))
 import datetime as _dt
 class _FakeDT(_dt.datetime):

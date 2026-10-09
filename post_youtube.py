@@ -95,7 +95,7 @@ def reel_short(queue, state):
         if not p or rid in linked or rid in done or p.get("no_youtube"):
             continue
         return {"id": rid, "kind": "short", "video": p["video"],
-                "title": REEL_TITLES[len(done) % len(REEL_TITLES)],
+                "title": p.get("yt_title") or REEL_TITLES[len(done) % len(REEL_TITLES)],   # 寿司などは reels.json の yt_title
                 "description": REEL_DESC.format(hook="ナイフを入れた瞬間、とろ〜り。何度見ても気持ちいい半熟オムライス。"),
                 "tags": REEL_TAGS}
     return None

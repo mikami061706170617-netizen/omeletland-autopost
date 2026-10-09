@@ -66,7 +66,7 @@ state = json.load(open(os.path.join(ROOT, "state.json"), encoding="utf-8"))
 state = {"history": [h for h in state.get("history", []) if h["date"] < "2026-09-20"]}
 seen, days = [], []
 base = datetime(2026, 9, 20)
-for d in range(30):
+for d in range(max(30, N + 2)):   # キューが30件を超えても一周＋折り返しまで確かめる
     day = base + timedelta(days=d)
     P.today_str = (lambda s: (lambda: s))(day.strftime("%Y-%m-%d"))
     pid, stop = P.pick(queue, state)

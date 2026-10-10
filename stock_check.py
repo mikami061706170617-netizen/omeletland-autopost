@@ -15,7 +15,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.abspath(__file__))
 TITLE = "📸 投稿の在庫が少なくなっています"
 DAYS = 3
-PHOTOS_PER_DAY = 2
+PHOTOS_PER_DAY = 1
+REELS_PER_DAY = 2
 
 
 def load(name):
@@ -37,8 +38,8 @@ def message(reels_left, photos_new):
         "",
         "| | 残り | 何日分 |",
         "|---|---|---|",
-        "| リール（毎日 20:00） | %d本 | %d日 |" % (len(reels_left), len(reels_left)),
-        "| まだ出していない写真（毎日 12:15・17:45） | %d枚 | %d日 |"
+        "| リール（毎日 12:37・19:37） | %d本 | %d日 |" % (len(reels_left), len(reels_left) // REELS_PER_DAY),
+        "| まだ出していない写真（毎日 17:45） | %d枚 | %d日 |"
         % (len(photos_new), len(photos_new) // PHOTOS_PER_DAY),
         "",
         "### 送ってほしいもの（スマホで撮ってチャットに貼るだけでOK）",
@@ -64,7 +65,7 @@ def github(method, path, payload=None):
 
 def main():
     reels_left, photos_new = stock(load("reels.json"), load("queue.json"), load("state.json"))
-    low = len(reels_left) < DAYS or len(photos_new) < DAYS * PHOTOS_PER_DAY
+    low = len(reels_left) < DAYS * REELS_PER_DAY or len(photos_new) < DAYS * PHOTOS_PER_DAY
     print("リール残り %d本 / まだ出していない写真 %d枚 → %s"
           % (len(reels_left), len(photos_new), "少ない" if low else "足りている"))
     if os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes") or not (os.environ.get("GITHUB_TOKEN") and os.environ.get("GITHUB_REPOSITORY")):

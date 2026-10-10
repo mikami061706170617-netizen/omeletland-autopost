@@ -2,8 +2,7 @@ name: daily post
 
 on:
   schedule:
-    # 1日2回: 開店（13:00）前のお昼どき と 夕食前（トビリシ = UTC+4）
-    - cron: "15 8 * * *"       # 08:15 UTC = 12:15 トビリシ
+    # 写真は1日1回（リール中心にしたため 2026-10-10〜）。夕方の空いた時間に
     - cron: "45 13 * * *"      # 13:45 UTC = 17:45 トビリシ
   workflow_dispatch:
     inputs:
@@ -29,7 +28,7 @@ jobs:
           # 場所タグ: 店の Facebook ページ（住所 1 Davit Gamrekeli St＝Japan Food Hub が入っている）を使う
           IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID || secrets.FB_PAGE_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
-          MAX_PER_DAY: "2"
+          MAX_PER_DAY: "1"
         run: python3 post.py
 
       - name: record

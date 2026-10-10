@@ -4,7 +4,9 @@ on:
   schedule:
     # GitHub は「ちょうど○時」が混んで数時間遅れるので、半端な分にする。2本目は1本目が来なかったときの予備
     #（同じ日に2本は出さない）
-    - cron: "37 15 * * *"      # 15:37 UTC = 19:37 トビリシ（毎日）
+    # リール中心（2026-10-10〜）: 1日2本。お昼前と夕食前。予備は来なかった分を埋める（1日2本まで・4時間あける）
+    - cron: "37 8 * * *"       # 08:37 UTC = 12:37 トビリシ
+    - cron: "37 15 * * *"      # 15:37 UTC = 19:37 トビリシ
     - cron: "41 17 * * *"      # 17:41 UTC = 21:41 トビリシ（予備）
   workflow_dispatch:
     inputs:
@@ -28,6 +30,7 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           PAGE_TOKEN: ${{ secrets.PAGE_TOKEN }}
           # 場所タグ: 店の Facebook ページ（住所 1 Davit Gamrekeli St＝Japan Food Hub が入っている）を使う
+          MAX_PER_DAY: "2"
           IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID || secrets.FB_PAGE_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: python3 post_reel.py

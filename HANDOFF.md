@@ -6,9 +6,9 @@
 ## 1. 全体の仕組み（GitHub Actions が毎日勝手に動く）
 | 時刻（トビリシ） | 何が出るか | 中身の置き場所 | 動かすもの |
 |---|---|---|---|
-| 12:15・17:45 | Instagram・Facebook に写真 **1日2枚**（開店前と夕食前） | `queue.json` ＋ `images/dNN.jpg`（1080×1350） | `daily.yml` → `post.py`（`MAX_PER_DAY=2`） |
+| 17:45 | Instagram・Facebook に写真 **1日1枚**（2026-10-10〜リール中心） | `queue.json` ＋ `images/dNN.jpg`（1080×1350） | `daily.yml` → `post.py`（`MAX_PER_DAY=1`） |
 | 15:00 | YouTube（今は **お知らせ方式**: Issue が届き、本人がスマホで手投稿） | `youtube.json`。出し切ったらインスタのリールを使う | `youtube.yml` → `post_youtube.py` |
-| 19:37（予備 21:41） | リール＋ストーリーズ＋Facebook 動画（1日1本） | `reels.json` ＋ `reels/RNN_*.mp4`（1080×1920） | `reel.yml` → `post_reel.py` |
+| 12:37・19:37（予備 21:41） | リール＋ストーリーズ＋Facebook 動画（**1日2本**・4時間あける） | `reels.json` ＋ `reels/RNN_*.mp4`（1080×1920） | `reel.yml` → `post_reel.py` |
 | 09:50 | 在庫チェック: リールか「まだ出していない写真」が3日分を切ると Issue「📸 投稿の在庫が少なくなっています」で本人に知らせる（戻ると自動で閉じる） | | `stock.yml` → `stock_check.py` |
 
 - GitHub の予約は数時間遅れることがある。「投稿の日」は朝6時に切り替わる（夜中0時を過ぎて動いても前の日の分）。

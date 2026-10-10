@@ -89,8 +89,14 @@ def pick(reels, state):
     order = reels["order"]
     posted = {h["id"] for h in state.get("reels_history", [])}
     today = today_str()
-    if any(h.get("date") == today for h in state.get("reels_history", [])):
-        return None, "今日はすでにリールを出しています"
+    hist = state.get("reels_history", [])
+    per_day = max(1, int(os.environ.get("MAX_PER_DAY", "1") or 1))
+    if sum(1 for h in hist if h.get("date") == today) >= per_day:
+        return None, "今日はすでにリールを %d 本出しています" % per_day
+    # 予約が遅れて2本が続けて出ないよう、前のリールから4時間はあける
+    last_at = next((h.get("at") for h in reversed(hist) if h.get("at")), None)
+    if last_at and datetime.now(TBILISI) - datetime.fromisoformat(last_at) < timedelta(hours=4):
+        return None, "前のリールから4時間たっていません"
     for pid in order:
         if pid not in posted:
             return pid, None
@@ -210,7 +216,7 @@ def main():
         print("Facebook は失敗しました（Instagramは成功）: %s" % e, file=sys.stderr)
 
     state.setdefault("reels_history", []).append({
-        "id": pid, "date": today_str(), "ig": ig_id, "ig_link": ig_link, "fb": fb_id,
+        "id": pid, "date": today_str(), "at": datetime.now(TBILISI).isoformat(timespec="minutes"), "ig": ig_id, "ig_link": ig_link, "fb": fb_id,
         "story": story_id,
     })
     save_state(state)

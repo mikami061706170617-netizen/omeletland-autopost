@@ -285,6 +285,21 @@ for f in ("reels.json", "queue.json"):
         if len(_out) > 2200 or _out.count("#") > 30:
             check("%s お知らせ込みでも 2200字・タグ30個以内" % k, False, "%d字" % len(_out))
 
+_spec = _ilu.spec_from_file_location("_fresh_pr2", os.path.join(ROOT, "post_reel.py"))
+_pr2 = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_pr2)
+_pr2.datetime = _FakeDT
+_FakeDT._t = _dt.datetime(2026, 10, 10, 19, 40, tzinfo=_pr2.TBILISI)
+_rq = {"order": ["A", "B", "C"]}
+os.environ["MAX_PER_DAY"] = "2"
+check("リール: 昼に1本出た日の夜は2本目が出る",
+      _pr2.pick(_rq, {"reels_history": [{"id": "A", "date": "2026-10-10", "at": "2026-10-10T12:40+04:00"}]})[0] == "B")
+check("リール: 前の1本から4時間たっていなければ出さない",
+      _pr2.pick(_rq, {"reels_history": [{"id": "A", "date": "2026-10-10", "at": "2026-10-10T18:00+04:00"}]})[0] is None)
+check("リール: 1日2本まで", _pr2.pick(_rq, {"reels_history": [
+      {"id": "A", "date": "2026-10-10", "at": "2026-10-10T08:00+04:00"},
+      {"id": "B", "date": "2026-10-10", "at": "2026-10-10T13:00+04:00"}]})[0] is None)
+os.environ.pop("MAX_PER_DAY")
+
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL
 job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [

@@ -14,7 +14,10 @@
     "R12",
     "R13",
     "R14",
-    "R15"
+    "R15",
+    "R16",
+    "R17",
+    "R18"
   ],
   "posts": {
     "R1": {
@@ -111,6 +114,24 @@
       "title": "Photo reel (inbox): 175CFE3A-71CE-408B-896E-732105F6CA83, 30EDCA56-33E5-4ACB-A0BA-222B10374A44, 550953DA-ABBB-457D-89F9-16CC587E02FA, 66390863-B169-40E5-A0DF-16C57DB80B52, 6674EAD4-A9CF-48E3-833C-FB30F54DA807, 6d47e6943e97d4fddcada1414da0c03997041ed37c29da45722ebd3bb45abb16",
       "video": "reels/R15_photos.mp4",
       "caption": "Pink, tender, flame-kissed 🔥🍣\nRoast Beef Nigiri — 2 pieces ₾18 · 5-piece platter ₾42\nვარდისფერი, რბილი, ცეცხლით შემწვარი — 2 ცალი 18₾ · ასორტი 5 ცალი 42₾\nРозовый, нежный, обожжённый огнём — 2 штуки 18₾ · ассорти из 5 штук 42₾\nHow many could you eat? Comment 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი"
+    },
+    "R16": {
+      "id": "R16",
+      "title": "Beef nigiri — built piece by piece",
+      "video": "reels/R16_beef_nigiri.mp4",
+      "caption": "Seared beef nigiri, built one piece at a time. 🔥🍣\nFrom plain to garlic chips to mayo — which one are you ordering? Made to order in our kitchen in Saburtalo.\n\nხორცის ნიგირი, ნაჭერ-ნაჭერ 🔥 რომელს აირჩევდით?\nНигири с говядиной — собираем по одному кусочку 🔥 Какое выберешь?\n\n💬 Plain, garlic chips or mayo — tell us in the comments\n📌 Save this for your next lunch in Tbilisi · 👯 Tag a friend who loves sushi\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #sushi #sushitbilisi #nigiri #суши"
+    },
+    "R17": {
+      "id": "R17",
+      "title": "Beef roll — roast beef, lemon, crispy onion",
+      "video": "reels/R17_beef_roll.mp4",
+      "caption": "Roast beef roll — sliced beef on top, crispy onion, mayo, a squeeze of lemon. 🥩🍋\nMade to order in our kitchen in Saburtalo.\n\nროსტბიფის როლი — კრუხუნა ხახვი, მაიონეზი, ლიმონი 🍋\nРолл с ростбифом — хрустящий лук, майонез, лимон 🍋\n\n💬 Plain or lemon-and-mayo? Tell us in the comments\n📌 Save this for your next lunch in Tbilisi · 👯 Tag a friend who loves sushi\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #sushi #sushitbilisi #nigiri #суши"
+    },
+    "R18": {
+      "id": "R18",
+      "title": "Crispy rolls — chicken and cucumber",
+      "video": "reels/R18_crispy_rolls.mp4",
+      "caption": "Crispy and sesame rolls — hand-rolled, made to order. 🍣\nCucumber with crunchy topping, chicken with greens and sesame. Which would you try first?\n\nხრაშუნა და ქუნჯუთიანი როლები — ხელით მომზადებული 🍣\nХрустящие роли и роли с кунжутом — готовим вручную, под заказ 🍣\n\n💬 Cucumber crunch or chicken sesame? Tell us in the comments\n📌 Save this for your next lunch in Tbilisi · 👯 Tag a friend who loves sushi\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #sushi #sushitbilisi #nigiri #суши"
     }
   }
 }

@@ -17,7 +17,11 @@
     "R15",
     "R16",
     "R17",
-    "R18"
+    "R18",
+    "R19",
+    "R20",
+    "R21",
+    "R22"
   ],
   "posts": {
     "R1": {
@@ -132,6 +136,30 @@
       "title": "Crispy rolls — chicken and cucumber",
       "video": "reels/R18_crispy_rolls.mp4",
       "caption": "Crispy and sesame rolls — hand-rolled, made to order. 🍣\nCucumber with crunchy topping, chicken with greens and sesame. Which would you try first?\n\nხრაშუნა და ქუნჯუთიანი როლები — ხელით მომზადებული 🍣\nХрустящие роли и роли с кунжутом — готовим вручную, под заказ 🍣\n\n💬 Cucumber crunch or chicken sesame? Tell us in the comments\n📌 Save this for your next lunch in Tbilisi · 👯 Tag a friend who loves sushi\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი #sushi #sushitbilisi #nigiri #суши"
+    },
+    "R19": {
+      "id": "R19",
+      "title": "Archive (Japan) — one pan, one flip",
+      "video": "reels/R19_archive_flip.mp4",
+      "caption": "One pan. One flip. 🍳\nChef Kyohei's kitchen (Japan, archive) — years of omurice before Tbilisi.\n\nერთი ტაფა, ერთი მოძრაობა 🍳 შეფ კიოჰეის სამზარეულო (იაპონია, არქივი).\nОдна сковорода, один переворот 🍳 Кухня шефа Кёхэя (Япония, архив).\n\n💬 Could you flip it like this? Tell us in the comments\n📌 Save it · 👯 Tag a friend who loves eggs\n\n📍 Today: Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #chefkyohei #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი"
+    },
+    "R20": {
+      "id": "R20",
+      "title": "Archive (Japan) — roll cabbage omurice",
+      "video": "reels/R20_archive_cabbage.mp4",
+      "caption": "Fire, egg, rice, sauce. 🔥\nRoll cabbage omurice with meat sauce and cream — Chef Kyohei's kitchen (Japan, archive).\n\nცეცხლი, კვერცხი, ბრინჯი, სოუსი 🔥 შეფ კიოჰეის სამზარეულო (იაპონია, არქივი).\nОгонь, яйцо, рис, соус 🔥 Голубцы и омурайсу — кухня шефа Кёхэя (Япония, архив).\n\n💬 Sauce on top or on the side? Tell us in the comments\n📌 Save it · 👯 Tag a friend who loves comfort food\n\n📍 Today: Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #chefkyohei #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი"
+    },
+    "R21": {
+      "id": "R21",
+      "title": "Archive (Japan) — omurice lunch box",
+      "video": "reels/R21_archive_bento.mp4",
+      "caption": "Omurice lunch box, start to finish. 🍱\nEgg, rice, flip, ketchup, hamburg — Chef Kyohei's kitchen (Japan, archive).\n\nომურაისის ლანჩბოქსი — დასაწყისიდან ბოლომდე 🍱 შეფ კიოჰეის სამზარეულო (იაპონია, არქივი).\nОмурайсу в ланч-боксе — от начала до конца 🍱 Кухня шефа Кёхэя (Япония, архив).\n\n💬 Would you want a lunch box like this in Tbilisi? Tell us in the comments\n📌 Save it · 👯 Tag your lunch buddy\n\n📍 Today: Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #chefkyohei #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი"
+    },
+    "R22": {
+      "id": "R22",
+      "title": "Archive (Japan) — hamburg for 100",
+      "video": "reels/R22_archive_hamburg.mp4",
+      "caption": "Hamburg steak for 100 people. By hand. 🥩\nCrack, whisk, knead — then one sizzling skillet. Chef Kyohei's kitchen (Japan, archive).\n\nჰამბურგ-სტეიკი 100 ადამიანისთვის, ხელით 🥩 შეფ კიოჰეის სამზარეულო (იაპონია, არქივი).\nГамбург-стейк на 100 человек — вручную 🥩 Кухня шефа Кёхэя (Япония, архив).\n\n💬 Hamburg or omurice — which one first? Tell us in the comments\n📌 Save it · 👯 Tag a friend who'd eat two\n\n📍 Today: Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–22:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #tbilisieats #tbilisifoodie #saburtalo #visitgeorgia #omurice #omuraisu #japanesefood #japanesefoodtbilisi #foodasmr #cookingvideo #eggs #chefkyohei #тбилиси #тбилисиеда #грузия #омурайсу #японскаяеда #თბილისი #საბურთალო #ომურაისი"
     }
   }
 }

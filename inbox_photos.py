@@ -88,7 +88,7 @@ def main():
         rid = M.next_id(reels)
         rel = "reels/%s_photos.mp4" % rid
         M.render_montage(segs, os.path.join(ROOT, rel), reveal_index=len(segs) - 1,
-                         hook="Fresh from our kitchen", pop="", dish="Omelet Land Tbilisi")
+                         hook="Fresh from our kitchen", pop="", dish="Omurice Land Tbilisi")
         reels["posts"][rid] = {"id": rid, "title": "Photo reel (inbox): " + ", ".join(s for _, s in made[:6]),
                                "video": rel, "caption": caption(made[0][1])}
         reels["order"].append(rid)

@@ -29,7 +29,8 @@ def now():
 
 
 def today_str():
-    return now().strftime("%Y-%m-%d")
+    # 夜中に遅れて動いた予備の schedule が「次の日の分」を先に出さないよう、1日の区切りは朝6時（post.py と同じ）
+    return (now() - timedelta(hours=6)).strftime("%Y-%m-%d")
 
 
 def load(name, default=None):

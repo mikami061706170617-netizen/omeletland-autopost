@@ -299,6 +299,20 @@ check("リール: 1日2本まで", _pr2.pick(_rq, {"reels_history": [
       {"id": "A", "date": "2026-10-10", "at": "2026-10-10T08:00+04:00"},
       {"id": "B", "date": "2026-10-10", "at": "2026-10-10T13:00+04:00"}]})[0] is None)
 os.environ.pop("MAX_PER_DAY")
+os.environ["SLOTS"] = "12:37,19:37"; os.environ["EVENT"] = "schedule"
+_T = lambda h, mi: _dt.datetime(2026, 10, 10, h, mi, tzinfo=_pr2.TBILISI)
+check("枠: 12:37 の起動は1枠目", _pr2.slots_due(_T(12, 37)) == 1)
+check("枠: 19:30（10分前）は2枠目", _pr2.slots_due(_T(19, 30)) == 2)
+check("枠: 夜中1時（前の日の分）は2枠とも来ている", _pr2.slots_due(_dt.datetime(2026, 10, 11, 1, 0, tzinfo=_pr2.TBILISI)) == 2)
+os.environ["MAX_PER_DAY"] = "2"
+_FakeDT._t = _T(16, 50)
+check("枠: 昼の分を出した後、遅れて来た予備は夜の枠を先取りしない",
+      _pr2.pick(_rq, {"reels_history": [{"id": "A", "date": "2026-10-10", "at": "2026-10-10T12:38+04:00"}]})[0] is None)
+_FakeDT._t = _T(16, 0)
+check("枠: 昼の kick が来なかった日は、遅れた予備が昼の分を出す", _pr2.pick(_rq, {"reels_history": []})[0] == "A")
+os.environ["EVENT"] = "workflow_dispatch"
+check("枠: 手動実行は枠で止めない", _pr2.slots_due(_T(9, 0)) is None)
+os.environ.pop("SLOTS"); os.environ.pop("EVENT"); os.environ.pop("MAX_PER_DAY")
 
 print("\n[8] 素材置き場（sozai）")
 import fetch_link as FL

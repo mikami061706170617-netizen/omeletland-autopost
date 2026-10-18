@@ -1,13 +1,16 @@
 name: reel post
 
 on:
+  # 時刻どおりに動かすため、外の予定タスクが決まった時刻に kick/reel ブランチへ空コミットを push して起動する。
+  # schedule は予備（GitHub の都合で数時間遅れる）。同じ枠は二重に出さない仕組みがスクリプト側にある。
+  push:
+    branches: [kick/reel]
   schedule:
     # GitHub は「ちょうど○時」が混んで数時間遅れるので、半端な分にする。2本目は1本目が来なかったときの予備
     #（同じ日に2本は出さない）
     # リール中心（2026-10-10〜）: 1日2本。お昼前と夕食前。予備は来なかった分を埋める（1日2本まで・4時間あける）
     - cron: "37 8 * * *"       # 08:37 UTC = 12:37 トビリシ
     - cron: "37 15 * * *"      # 15:37 UTC = 19:37 トビリシ
-    - cron: "41 17 * * *"      # 17:41 UTC = 21:41 トビリシ（予備）
   workflow_dispatch:
     inputs:
       dry_run:
@@ -23,6 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main          # kick ブランチから起動しても、コードと記録は main のもの
 
       - name: post reel
         env:
@@ -32,16 +37,19 @@ jobs:
           # 場所タグ: 店の Facebook ページ（住所 1 Davit Gamrekeli St＝Japan Food Hub が入っている）を使う
           MAX_PER_DAY: "2"
           IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID || secrets.FB_PAGE_ID }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          DRY_RUN: ${{ inputs.dry_run || contains(github.event.head_commit.message, 'dry_run') }}
+          SLOTS: "12:37,19:37"     # この時刻の枠（トビリシ）。遅れた予備が次の枠を先取りしない
+          EVENT: ${{ github.event_name }}
         run: python3 post_reel.py
 
       - name: record
-        if: ${{ success() && inputs.dry_run != true }}
+        if: ${{ success() && inputs.dry_run != true && !contains(github.event.head_commit.message, 'dry_run') }}
         run: |
           if [ -n "$(git status --porcelain state.json)" ]; then
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add state.json
             git commit -m "reel posted $(date -u +%F)"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi

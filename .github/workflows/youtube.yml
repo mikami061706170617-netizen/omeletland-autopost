@@ -4,6 +4,10 @@ name: youtube post
 # 今は notify モード: Issue で「今日の動画・タイトル・説明」を知らせ、スマホから手で投稿する。
 # API 審査に通ったら、リポジトリの Variables に YT_MODE=auto を入れると自動アップロードに変わる。
 on:
+  # 時刻どおりに動かすため、外の予定タスクが決まった時刻に kick/youtube ブランチへ空コミットを push して起動する。
+  # schedule は予備（GitHub の都合で数時間遅れる）。同じ枠は二重に出さない仕組みがスクリプト側にある。
+  push:
+    branches: [kick/youtube]
   schedule:
     - cron: "13 11 * * *"
   workflow_dispatch:
@@ -30,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main          # kick ブランチから起動しても、コードと記録は main のもの
 
       - name: post
         env:
@@ -38,12 +44,12 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          DRY_RUN: ${{ inputs.dry_run || contains(github.event.head_commit.message, 'dry_run') }}
           FORCE_LONG: ${{ inputs.force_long }}
         run: python3 post_youtube.py
 
       - name: record
-        if: ${{ success() && inputs.dry_run != true }}
+        if: ${{ success() && inputs.dry_run != true && !contains(github.event.head_commit.message, 'dry_run') }}
         run: |
           if [ -n "$(git status --porcelain state.json)" ]; then
             git config user.name  "github-actions[bot]"
@@ -51,5 +57,5 @@ jobs:
             git add state.json
             git commit -m "youtube $(date -u +%F)"
             git pull --rebase origin main
-            git push
+            git push origin HEAD:main
           fi

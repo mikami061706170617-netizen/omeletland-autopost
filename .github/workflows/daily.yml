@@ -1,6 +1,10 @@
 name: daily post
 
 on:
+  # 時刻どおりに動かすため、外の予定タスクが決まった時刻に kick/daily ブランチへ空コミットを push して起動する。
+  # schedule は予備（GitHub の都合で数時間遅れる）。同じ枠は二重に出さない仕組みがスクリプト側にある。
+  push:
+    branches: [kick/daily]
   schedule:
     # 写真は1日1回（リール中心にしたため 2026-10-10〜）。夕方の空いた時間に
     - cron: "45 13 * * *"      # 13:45 UTC = 17:45 トビリシ
@@ -19,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main          # kick ブランチから起動しても、コードと記録は main のもの
 
       - name: post
         env:
@@ -27,12 +33,12 @@ jobs:
           PAGE_TOKEN: ${{ secrets.PAGE_TOKEN }}
           # 場所タグ: 店の Facebook ページ（住所 1 Davit Gamrekeli St＝Japan Food Hub が入っている）を使う
           IG_LOCATION_ID: ${{ secrets.IG_LOCATION_ID || secrets.FB_PAGE_ID }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          DRY_RUN: ${{ inputs.dry_run || contains(github.event.head_commit.message, 'dry_run') }}
           MAX_PER_DAY: "1"
         run: python3 post.py
 
       - name: record
-        if: ${{ success() && inputs.dry_run != true }}
+        if: ${{ success() && inputs.dry_run != true && !contains(github.event.head_commit.message, 'dry_run') }}
         run: |
           if [ -n "$(git status --porcelain state.json)" ]; then
             git config user.name  "github-actions[bot]"
@@ -40,5 +46,5 @@ jobs:
             git add state.json
             git commit -m "posted $(date -u +%F_%H%M)"
             git pull --rebase origin main
-            git push
+            git push origin HEAD:main
           fi

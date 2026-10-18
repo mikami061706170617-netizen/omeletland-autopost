@@ -85,6 +85,27 @@ def video_urls(post):
     ]
 
 
+def slots_due(now=None):
+    """SLOTS（トビリシ時刻 "HH:MM,HH:MM"）のうち、今日もう来ている枠の数。
+    SLOTS が無いときや手動実行（EVENT=workflow_dispatch）のときは None（制限しない）。
+    1日の区切りは today_str と同じ朝6時。枠の10分前から「来た」とみなす。"""
+    slots = [x.strip() for x in os.environ.get("SLOTS", "").split(",") if x.strip()]
+    if not slots or os.environ.get("EVENT", "") == "workflow_dispatch":
+        return None
+    now = now or datetime.now(TBILISI)
+    shifted = now - timedelta(hours=6)
+    mins = shifted.hour * 60 + shifted.minute + 360      # 朝6時起点の「その日の分」
+    n = 0
+    for x in slots:
+        h, m = x.split(":")
+        sm = int(h) * 60 + int(m)
+        if sm < 360:
+            sm += 1440
+        if mins >= sm - 10:
+            n += 1
+    return n
+
+
 def pick(reels, state):
     order = reels["order"]
     posted = {h["id"] for h in state.get("reels_history", [])}
@@ -97,6 +118,11 @@ def pick(reels, state):
     last_at = next((h.get("at") for h in reversed(hist) if h.get("at")), None)
     if last_at and datetime.now(TBILISI) - datetime.fromisoformat(last_at) < timedelta(hours=4):
         return None, "前のリールから4時間たっていません"
+    # 時刻どおりの起動（kick ブランチへの push）を正にし、遅れて来た予備の schedule は
+    # 「もう来ているはずの枠の数」より少ないときだけ出す（SLOTS="12:37,19:37"、手動実行は対象外）
+    due = slots_due()
+    if due is not None and sum(1 for h in hist if h.get("date") == today) >= due:
+        return None, "この時刻の枠はもう出しています（%d 枠分）" % due
     for pid in order:
         if pid not in posted:
             return pid, None

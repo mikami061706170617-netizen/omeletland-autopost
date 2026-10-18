@@ -65,7 +65,7 @@ REEL_DESC = """{hook}
 
 ━━━━━━━━━━
 📍 お店：Omelet Land Tbilisi（Japan Food Hub 内）
-ジョージア・トビリシ、サブルタロ地区 / 毎日 13:00–22:00
+ジョージア・トビリシ、サブルタロ地区 / 毎日 13:00–24:00
 Instagram：https://www.instagram.com/omeletland.tbilisi/
 ━━━━━━━━━━
 🔔 チャンネル登録で、海外オムライス屋の毎日をお届けします

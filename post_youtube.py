@@ -64,7 +64,7 @@ REEL_DESC = """{hook}
 ジョージア・トビリシの日本人オムライス屋の厨房から。最後まで見てね。
 
 ━━━━━━━━━━
-📍 お店：Omelet Land Tbilisi（Japan Food Hub 内）
+📍 お店：Omurice Land Tbilisi（Japan Food Hub 内）
 ジョージア・トビリシ、サブルタロ地区 / 毎日 13:00–24:00
 Instagram：https://www.instagram.com/omeletland.tbilisi/
 ━━━━━━━━━━

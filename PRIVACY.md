@@ -1,9 +1,9 @@
 # Privacy Policy — Omelet Land Auto Post
 
-Last updated: 2026-09-25
+Last updated: 2026-10-19
 
 This is the privacy policy for "Omelet Land Auto Post", a small internal tool run by
-Omelet Land Tbilisi (Georgia) and the YouTube channel "オムライス研究所 三上きょうへい".
+Omurice Land Tbilisi (Georgia) and the YouTube channel "オムライス研究所 三上きょうへい".
 The tool posts our own restaurant videos to our own YouTube, Instagram and Facebook accounts
 on a daily schedule. It is not offered to the public and has no other users.
 
@@ -36,5 +36,5 @@ Revoking access in the Google security settings removes the tool's access immedi
 We delete the stored token within 7 days of revocation or on request.
 
 ## Contact
-Omelet Land Tbilisi — contact through the GitHub repository owner
+Omurice Land Tbilisi — contact through the GitHub repository owner
 (https://github.com/mikami061706170617-netizen).

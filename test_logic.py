@@ -321,6 +321,15 @@ job = {"url": "sozai", "mode": "batch", "to_main": True, "items": [
     {"type": "youtube", "id": "S9", "segments": [["a.MOV", 6, 9, 1]]}]}
 check("使った元動画だけを数える（二重なし）", FL.used_names(job) == ["a.MOV", "b.MOV"], str(FL.used_names(job)))
 check("下見ジョブは何も消さない", FL.used_names({"url": "sozai", "mode": "preview"}) == [])
+print("\n[9] 写真はストーリーズへ（2026-10-26）")
+os.environ.pop("POST_AS", None)
+check("写真: ふだんはストーリーズ", P.post_mode() == "story")
+_sp = P.ig_params("https://x/a.jpg", "cap", "123", "T", "story")
+check("写真: ストーリーズはキャプション・場所なし", _sp.get("media_type") == "STORIES" and "caption" not in _sp and "location_id" not in _sp, str(_sp))
+os.environ["POST_AS"] = "feed"
+check("写真: POST_AS=feed で従来のフィード", P.post_mode() == "feed" and P.ig_params("u", "cap", "123", "T", "feed").get("location_id") == "123")
+os.environ.pop("POST_AS")
+
 import py_compile
 try:
     py_compile.compile(os.path.join(ROOT, "upload_inbox.py"), doraise=True)

@@ -41,6 +41,10 @@ VIDEO_EXT = (".mov", ".mp4", ".m4v")
 # 中身は普通の 8bit 映像として作っているので、出力には必ず SDR（bt709）の印を付ける。
 SDR = ["-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"]
 W, H, FPS, SR = 1080, 1920, 30, 48000
+# 「額縁」レイアウト（framed=True）: 横の素材を 4:3 までしか切らずに真ん中へ置き、上下は無地の帯にして文字を載せる。
+# 9:16 にいっぱいに切り抜くと左右が大きく切れて「見にくい」ため（2026-10-27 本人の指示）。
+# ぼかしの帯は使わない（流用に見える）。帯は無地の色。
+FRAME_Y, FRAME_H, FRAME_BG = 360, 810, "0x141010"
 
 FAST = 1.6          # 焼いている前半の早送り倍率
 SLOW = 0.5          # パカーンの瞬間のスロー倍率
@@ -257,8 +261,12 @@ def _text(tmp, name, text, font, size, y, t0, t1, color="white"):
                 font=font, path=path, size=size, color=color, y=y, t0=t0, t1=t1)
 
 
-def look_chain(reveal, total, texts, tmp, font, crop=True, sharp=0.7):
-    """色づけ・フラッシュ・文字入れ（動画でも写真でも共通）。"""
+def look_chain(reveal, total, texts, tmp, font, crop=True, sharp=0.7, framed=None):
+    """色づけ・フラッシュ・文字入れ（動画でも写真でも共通）。
+
+    framed=(title, footer) のときは額縁レイアウト: 上の帯に title（冒頭の一言のあと、最後まで）、
+    下の帯に footer（ずっと）を出す。ビネットは帯を汚すので使わない。
+    """
     look = []
     if crop:
         look += ["scale=%d:%d:force_original_aspect_ratio=increase" % (W, H), "crop=%d:%d" % (W, H)]
@@ -268,7 +276,10 @@ def look_chain(reveal, total, texts, tmp, font, crop=True, sharp=0.7):
         "colorbalance=rm=0.05:gm=0.01:bm=-0.05:rh=0.03:bh=-0.03",
         "vibrance=intensity=0.15",
         "unsharp=5:5:%.2f:5:5:0" % sharp,
-        "vignette=angle=PI/6",
+    ]
+    if not framed:
+        look.append("vignette=angle=PI/6")
+    look += [
         # パカーンの瞬間の白フラッシュ
         "drawbox=x=0:y=0:w=iw:h=ih:color=white@0.45:t=fill:enable='between(t,%.2f,%.2f)'"
         % (reveal, reveal + 0.07),
@@ -286,6 +297,14 @@ def look_chain(reveal, total, texts, tmp, font, crop=True, sharp=0.7):
         if place:
             look.append(_text(tmp, "place", place, font, 44, "h*0.78", max(reveal + 1.7, total - 3.8),
                               total))
+        if framed:
+            title, footer = framed
+            if title:
+                look.append(_text(tmp, "title", title, font, 64, "h*0.12",
+                                  min(2.8, max(0.0, reveal - 0.6)) if hook else 0, total))
+            if footer:
+                look.append(_text(tmp, "footer", footer, font, 40, "%d" % (FRAME_Y + FRAME_H + 40),
+                                  0, total, color="0xFFD23F"))
     look.append("format=yuv420p")
     return look
 
@@ -365,7 +384,8 @@ def render(src, out, reveal=None, start=0.0, end=None, hook="Watch it open.",
 
 
 def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=None,
-                   place="JAPAN FOOD HUB · SABURTALO", music="grand", wide=False, max_len=90):
+                   place="JAPAN FOOD HUB · SABURTALO", music="grand", wide=False, max_len=90,
+                   framed=False, title="", footer=""):
     """複数の動画から区間をつなげて1本のリールにする。
 
     segments: [(元動画のパス, 開始秒, 終了秒, 速度), ...]  速度 2.0 = 2倍速、0.5 = スロー
@@ -373,6 +393,7 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
     実音（ジュージュー）は強調して残し、合成BGMと効果音を重ねる。
     music="grand"（既定）で料理ドラマ風BGM（cinematic.py）、"georgian" でジョージア風（music.py）。wide=True で 1920×1080 の横長
     （縦の素材は中央に置き、左右は黒。ぼかし帯は使わない）。
+    framed=True で額縁レイアウト（横の素材を 4:3 で真ん中に置き、上の帯に title、下の帯に footer）。
     """
     if not shutil.which("ffmpeg"):
         raise RuntimeError("ffmpeg がありません")
@@ -415,6 +436,10 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
         for n, (p, s0, e, sp) in enumerate(segments):
             if wide:
                 fit = "scale=-2:{h},pad={w}:{h}:(ow-iw)/2:0:black,setsar=1".format(w=ow, h=oh)
+            elif framed:
+                fit = ("scale={w}:{fh}:force_original_aspect_ratio=increase,crop={w}:{fh},"
+                       "pad={w}:{h}:0:{fy}:color={bg},setsar=1").format(
+                           w=ow, h=oh, fh=FRAME_H, fy=FRAME_Y, bg=FRAME_BG)
             else:
                 fit = "scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1".format(w=ow, h=oh)
             v = ("[{l}]trim={s:.3f}:{e:.3f},setpts=(PTS-STARTPTS)/{sp},{fit}").format(
@@ -431,7 +456,8 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
             cat.append("[sv%d][sa%d]" % (n, n))
         parts.append("%sconcat=n=%d:v=1:a=1[cv][ca]" % ("".join(cat), len(segments)))
         dish_line = dish + (" · %s GEL" % price if price else "") if dish else ""
-        look = look_chain(reveal, total, (hook, pop, dish_line, place), tmp, find_font(), crop=False)
+        look = look_chain(reveal, total, (hook, pop, dish_line, place), tmp, find_font(), crop=False,
+                          framed=(title, footer) if framed else None)
         parts.append("[cv]" + ",".join(look) + "[outv]")
         parts.append("[ca]highpass=f=90,equalizer=f=5500:t=q:w=1.2:g=5,"
                      "acompressor=threshold=-24dB:ratio=3:attack=5:release=150:makeup=3[real]")

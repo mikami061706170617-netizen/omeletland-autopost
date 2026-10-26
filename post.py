@@ -106,10 +106,27 @@ def image_url_for(post):
     return urllib.parse.urljoin(base if base.endswith("/") else base + "/", post["image"])
 
 
-def post_instagram(ig_user, token, img, caption, location_id):
+def post_mode():
+    """写真の出し先。2026-10-26 本人決定：写真はフィードでは伸びない（リールの約1/10）ので、
+    ふだんはストーリーズだけに出す。POST_AS=feed のときだけ従来どおりフィード＋FBページ。"""
+    v = (os.environ.get("POST_AS") or "story").strip().lower()
+    return "feed" if v == "feed" else "story"
+
+
+def ig_params(img, caption, location_id, token, mode):
+    if mode == "story":
+        # ストーリーズはキャプション・場所タグを付けられない
+        return {"image_url": img, "media_type": "STORIES", "access_token": token}
     params = {"image_url": img, "caption": caption, "access_token": token}
     if location_id:
         params["location_id"] = location_id
+    return params
+
+
+def post_instagram(ig_user, token, img, caption, location_id, mode="feed"):
+    if mode == "story":
+        location_id = ""
+    params = ig_params(img, caption, location_id, token, mode)
     try:
         container = api("%s/media" % ig_user, params, "POST")["id"]
     except RuntimeError as e:
@@ -176,19 +193,24 @@ def main():
     print("文字数  : %d / ハッシュタグ %d 個" % (len(post["caption"]), post["caption"].count("#")))
 
     if dry:
+        print("出し先  : %s" % ("ストーリーズ" if post_mode() == "story" else "フィード＋FBページ"))
         print("\n--- DRY RUN: 実際には投稿していません ---")
         print(post["caption"])
         return 0
 
-    ig_id, ig_link = post_instagram(ig_user, token, img, post["caption"], location_id)
-    print("Instagram 投稿しました: %s" % (ig_link or ig_id))
+    mode = post_mode()
+    ig_id, ig_link = post_instagram(ig_user, token, img, post["caption"], location_id, mode)
+    print("Instagram %s に出しました: %s" % ("ストーリーズ" if mode == "story" else "フィード", ig_link or ig_id))
 
     fb_id, fb_link = "", ""
-    try:
-        fb_id, fb_link = post_facebook(page_id, token, img, post["caption"])
-        print("Facebook 投稿しました: %s" % fb_link)
-    except Exception as e:
-        print("Facebook は失敗しました（Instagramは成功）: %s" % e, file=sys.stderr)
+    if mode == "feed":
+        try:
+            fb_id, fb_link = post_facebook(page_id, token, img, post["caption"])
+            print("Facebook 投稿しました: %s" % fb_link)
+        except Exception as e:
+            print("Facebook は失敗しました（Instagramは成功）: %s" % e, file=sys.stderr)
+    else:
+        print("ストーリーズのみ（Facebookページのフィードには出さない）")
 
     state.setdefault("history", []).append({
         "id": pid,
@@ -196,6 +218,7 @@ def main():
         "ig": ig_id,
         "ig_link": ig_link,
         "fb": fb_id,
+        "as": mode,
     })
     save_state(state)
     print("state.json に記録しました")

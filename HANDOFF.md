@@ -69,3 +69,8 @@ Mac の Claude なら写真アプリから直接取り出せる。
   フィルタの最後に `setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709` を足し、
   できたものを `ffmpeg -display_rotation 0 -i 入力 -c copy 出力` に通してから `reels/` に置く。
 - 写真アプリは `search for "寿司"` で探せる。書き出しは1本ずつ（iCloud から降りてくるので数分かかる）。
+
+## 2026-10-26 写真はストーリーズだけに
+- 本人決定：写真はフィードでリールの約1/10しか見られない（@omeletland.tbilisi 9/25〜10/26：リール中央値 約340回、写真 約37回）。
+- `post.py` は既定でストーリーズ（media_type=STORIES、キャプション・場所なし、FBページには出さない）。フィードに戻すときは Actions の環境変数 `POST_AS=feed`。
+- フィードはリールだけ。

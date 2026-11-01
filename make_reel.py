@@ -391,7 +391,8 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
     segments: [(元動画のパス, 開始秒, 終了秒, 速度), ...]  速度 2.0 = 2倍速、0.5 = スロー
     reveal_index: この区間の頭で白フラッシュ＋ポン＋キラッ（いちばん美味しそうな瞬間）
     実音（ジュージュー）は強調して残し、合成BGMと効果音を重ねる。
-    music="grand"（既定）で料理ドラマ風BGM（cinematic.py）、"georgian" でジョージア風（music.py）。wide=True で 1920×1080 の横長
+    music="grand"（既定）で料理ドラマ風BGM（cinematic.py）、"georgian" でジョージア風（music.py）、
+    "wedding" で結婚式のピアノと弦（カノン）、"indian" でインドの結婚式風（wedding_music.py）。wide=True で 1920×1080 の横長
     （縦の素材は中央に置き、左右は黒。ぼかし帯は使わない）。
     framed=True で額縁レイアウト（横の素材を 4:3 で真ん中に置き、上の帯に title、下の帯に footer）。
     """
@@ -418,6 +419,10 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
         elif music == "georgian":
             import music as MU
             write_wav(bed, MU.georgian_bed(total + 0.5, reveal))
+        elif music in ("wedding", "indian"):
+            import wedding_music as WM
+            fn = WM.wedding_bed if music == "wedding" else WM.indian_bed
+            write_wav(bed, fn(total + 0.5, reveal))
         else:
             write_wav(bed, synth_bed(total + 0.5, reveal))
         cmd = ["ffmpeg", "-y", "-v", "error"]
@@ -463,7 +468,7 @@ def render_montage(segments, out, reveal_index, hook="", pop="", dish="", price=
                      "acompressor=threshold=-24dB:ratio=3:attack=5:release=150:makeup=3[real]")
         parts.append("[%d:a]aformat=channel_layouts=mono[bed]" % len(srcs))
         # 実音（ジュージュー）を主役に、音楽は少し下げる
-        wts = {"grand": "1 0.55", "georgian": "0.8 0.6"}.get(music, "1 0.8")
+        wts = {"grand": "1 0.55", "georgian": "0.8 0.6", "wedding": "0.6 0.8", "indian": "0.6 0.8"}.get(music, "1 0.8")
         parts.append("[real][bed]amix=inputs=2:weights='%s':normalize=0:duration=first,"
                      "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.7:level=false,"
                      "aresample=%d,aformat=channel_layouts=stereo[outa]" % (wts, SR))

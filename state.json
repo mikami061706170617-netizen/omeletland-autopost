@@ -311,6 +311,54 @@
       "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4017937923613963940",
       "fb": "",
       "as": "story"
+    },
+    {
+      "id": "D47",
+      "date": "2026-10-29",
+      "ig": "18086919389320350",
+      "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4018824775388123446",
+      "fb": "",
+      "as": "story"
+    },
+    {
+      "id": "D35",
+      "date": "2026-10-30",
+      "ig": "18022248491728785",
+      "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4019386227774679342",
+      "fb": "",
+      "as": "story"
+    },
+    {
+      "id": "D48",
+      "date": "2026-10-31",
+      "ig": "18438309679182729",
+      "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4020110441712225639",
+      "fb": "",
+      "as": "story"
+    },
+    {
+      "id": "D36",
+      "date": "2026-11-01",
+      "ig": "18253048978313371",
+      "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4020834883887221683",
+      "fb": "",
+      "as": "story"
+    },
+    {
+      "id": "D54",
+      "date": "2026-11-02",
+      "ig": "18106156334277177",
+      "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4021571197551582567",
+      "fb": "",
+      "as": "story"
+    },
+    {
+      "id": "D37",
+      "date": "2026-11-03",
+      "ig": "18454460773122469",
+      "ig_link": "https://www.instagram.com/stories/omeletland.tbilisi/4022286088551216071",
+      "fb": "",
+      "as": "story"
     }
   ],
   "reels_history": [
@@ -660,6 +708,96 @@
       "ig_link": "https://www.instagram.com/reel/DfDTjUfDSbP/",
       "fb": "1126627583077570",
       "story": "18093987131194735"
+    },
+    {
+      "id": "R41",
+      "date": "2026-10-29",
+      "at": "2026-10-29T14:12+04:00",
+      "ig": "17941282851381959",
+      "ig_link": "https://www.instagram.com/reel/DfEwxBHjPnx/",
+      "fb": "1160934766272095",
+      "story": "18152500930544810"
+    },
+    {
+      "id": "R42",
+      "date": "2026-10-29",
+      "at": "2026-10-29T19:35+04:00",
+      "ig": "18002322900008607",
+      "ig_link": "https://www.instagram.com/reel/DfFVt8LjVVc/",
+      "fb": "1775245460410113",
+      "story": "18058633784564513"
+    },
+    {
+      "id": "R43",
+      "date": "2026-10-30",
+      "at": "2026-10-30T12:42+04:00",
+      "ig": "18148451614494417",
+      "ig_link": "https://www.instagram.com/reel/DfHLOKFEf3S/",
+      "fb": "1481134980867966",
+      "story": "18076423955764776"
+    },
+    {
+      "id": "R44",
+      "date": "2026-10-30",
+      "at": "2026-10-31T00:08+04:00",
+      "ig": "18133304254690811",
+      "ig_link": "https://www.instagram.com/reel/DfIZsqWCJ3k/",
+      "fb": "3587012974801381",
+      "story": "17870312091659926"
+    },
+    {
+      "id": "R45",
+      "date": "2026-10-31",
+      "at": "2026-10-31T18:46+04:00",
+      "ig": "18111743960349660",
+      "ig_link": "https://www.instagram.com/reel/DfKZvZwDclP/",
+      "fb": "1676674524061618",
+      "story": "18133787959752678"
+    },
+    {
+      "id": "R46",
+      "date": "2026-10-31",
+      "at": "2026-10-31T23:33+04:00",
+      "ig": "17956984401034597",
+      "ig_link": "https://www.instagram.com/reel/DfK6hRqjjEm/",
+      "fb": "1674714857512846",
+      "story": "18469968850186315"
+    },
+    {
+      "id": "R47",
+      "date": "2026-11-01",
+      "at": "2026-11-01T19:29+04:00",
+      "ig": "17954974932323706",
+      "ig_link": "https://www.instagram.com/reel/DfNDczVEvQd/",
+      "fb": "870465639463555",
+      "story": "17974183713157027"
+    },
+    {
+      "id": "R48",
+      "date": "2026-11-01",
+      "at": "2026-11-01T23:56+04:00",
+      "ig": "18229475662336084",
+      "ig_link": "https://www.instagram.com/reel/DfNh763DMaH/",
+      "fb": "1844203980053865",
+      "story": "18077962877459506"
+    },
+    {
+      "id": "R49",
+      "date": "2026-11-02",
+      "at": "2026-11-02T22:53+04:00",
+      "ig": "18000044901020961",
+      "ig_link": "https://www.instagram.com/reel/DfP_gMGlS7z/",
+      "fb": "2038917750157808",
+      "story": "17903781645379164"
+    },
+    {
+      "id": "R50",
+      "date": "2026-11-02",
+      "at": "2026-11-03T03:17+04:00",
+      "ig": "18097411883151733",
+      "ig_link": "https://www.instagram.com/reel/DfQd1qyk7Rk/",
+      "fb": "4518952588392778",
+      "story": "18138266977653445"
     }
   ],
   "youtube_history": [
@@ -886,6 +1024,54 @@
       "mode": "notify",
       "youtube": "",
       "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/58"
+    },
+    {
+      "id": "R29",
+      "kind": "short",
+      "date": "2026-10-29",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/60"
+    },
+    {
+      "id": "R30",
+      "kind": "short",
+      "date": "2026-10-30",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/63"
+    },
+    {
+      "id": "R31",
+      "kind": "short",
+      "date": "2026-10-31",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/64"
+    },
+    {
+      "id": "R32",
+      "kind": "short",
+      "date": "2026-11-01",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/65"
+    },
+    {
+      "id": "R33",
+      "kind": "short",
+      "date": "2026-11-02",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/66"
+    },
+    {
+      "id": "R34",
+      "kind": "short",
+      "date": "2026-11-03",
+      "mode": "notify",
+      "youtube": "",
+      "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/67"
     }
   ]
 }

@@ -99,7 +99,7 @@ def image_url_for(post):
     base = os.environ.get("IMAGE_BASE_URL")
     if not base:
         repo = os.environ.get("GITHUB_REPOSITORY")
-        ref = os.environ.get("GITHUB_REF_NAME", "main")
+        ref = os.environ.get("MEDIA_REF", "main")  # kick ブランチから起動しても画像・動画は main を見る
         if not repo:
             raise RuntimeError("IMAGE_BASE_URL か GITHUB_REPOSITORY が必要です")
         base = "https://raw.githubusercontent.com/%s/%s/" % (repo, ref)

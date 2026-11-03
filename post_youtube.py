@@ -104,7 +104,7 @@ def reel_short(queue, state):
 
 def video_url(post):
     repo = os.environ.get("GITHUB_REPOSITORY", "")
-    ref = os.environ.get("GITHUB_REF_NAME", "main")
+    ref = os.environ.get("MEDIA_REF", "main")  # kick ブランチから起動しても画像・動画は main を見る
     return "https://github.com/%s/raw/%s/%s" % (repo, ref, post["video"])
 
 

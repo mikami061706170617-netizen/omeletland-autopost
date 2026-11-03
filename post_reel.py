@@ -76,7 +76,8 @@ def video_urls(post):
         base = explicit if explicit.endswith("/") else explicit + "/"
         return [urllib.parse.urljoin(base, post["video"])]
     repo = os.environ.get("GITHUB_REPOSITORY")
-    ref = os.environ.get("GITHUB_REF_NAME", "main")
+    # kick/reel から起動しても、動画は main に置いてあるので必ず main を見る
+    ref = os.environ.get("MEDIA_REF", "main")
     if not repo:
         raise RuntimeError("VIDEO_BASE_URL か GITHUB_REPOSITORY が必要です")
     return [

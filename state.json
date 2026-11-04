@@ -1062,25 +1062,33 @@
       "id": "R32",
       "kind": "short",
       "date": "2026-11-01",
-      "mode": "notify",
-      "youtube": "",
+      "mode": "manual",
+      "youtube": "https://youtube.com/shorts/UXNbLzLzYbc",
       "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/65"
     },
     {
       "id": "R33",
       "kind": "short",
       "date": "2026-11-02",
-      "mode": "notify",
-      "youtube": "",
+      "mode": "manual",
+      "youtube": "https://youtube.com/shorts/rK7giozqb_g",
       "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/66"
     },
     {
       "id": "R34",
       "kind": "short",
       "date": "2026-11-03",
-      "mode": "notify",
-      "youtube": "",
+      "mode": "manual",
+      "youtube": "https://youtube.com/shorts/l-f5rHBFYVo",
       "link": "https://github.com/mikami061706170617-netizen/omeletland-autopost/issues/67"
+    },
+    {
+      "id": "R54",
+      "kind": "short",
+      "date": "2026-11-04",
+      "mode": "manual",
+      "youtube": "https://youtube.com/shorts/2WePWrDLXto",
+      "link": ""
     }
   ]
 }

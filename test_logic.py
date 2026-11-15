@@ -64,6 +64,7 @@ print("\n[3] 30日連続シミュレーション（二重投稿・折り返し�
 state = json.load(open(os.path.join(ROOT, "state.json"), encoding="utf-8"))
 # 実際の履歴は日々進むので、シミュレーション開始日（9/20）より前だけを使う
 state = {"history": [h for h in state.get("history", []) if h["date"] < "2026-09-20"]}
+pre = list(state["history"])   # 9/20 より前に出し済み（二度と出さない）
 seen, days = [], []
 base = datetime(2026, 9, 20)
 for d in range(max(30, N + 2)):   # キューが30件を超えても一周＋折り返しまで確かめる
@@ -85,9 +86,8 @@ for pid in seen:
 missing = [k for k in queue["order"] if k not in first]   # 一周で出なかった回（期限切れのはず）
 check("初日は D04（シェフの物語）", seen[0] == "D04", seen[0])
 check("一周で全件（重複なし・抜けは期限切れだけ）",
-      all(queue["posts"][k].get("expiry") for k in missing), ",".join(missing) or "抜けなし")
-check("一周したら折り返す", len(seen) > len(first) and seen[len(first)] == first[0],
-      seen[len(first)] if len(seen) > len(first) else "-")
+      all(queue["posts"][k].get("expiry") or k in {h["id"] for h in pre} for k in missing), ",".join(missing) or "抜けなし")
+check("一周したら同じ写真は出さない（折り返さない）", len(seen) == len(set(seen)), ",".join(seen[-3:]))
 after_nov = [pid for (d, pid) in days if d >= "11-01" and pid != "stop"]
 check("11/1以降 D05 は出ない", "D05" not in after_nov, ",".join(after_nov[:6]))
 

@@ -86,13 +86,17 @@ def pick(queue, state):
         last = history[-1]["id"]
         start = (order.index(last) + 1) if last in order else 0
 
+    # 2026-11-15 本人指示「何回も使ってる写真はもう使わないように」：一度出した写真は二度と出さない（折り返さない）
+    used = {h.get("id") for h in history}
     for step in range(len(order)):
         pid = order[(start + step) % len(order)]
+        if pid in used:
+            continue
         expiry = posts[pid].get("expiry")
         if expiry and today > expiry:
             continue
         return pid, None
-    return None, "出せる投稿がありません（全件が期限切れ）"
+    return None, "出せる写真がありません（全部出し済みか期限切れ。新しい写真が必要）"
 
 
 def image_url_for(post):

@@ -81,7 +81,11 @@
     "R79",
     "R80",
     "R81",
-    "R82"
+    "R82",
+    "R83",
+    "R84",
+    "R85",
+    "R86"
   ],
   "posts": {
     "R1": {
@@ -580,6 +584,30 @@
       "title": "Izakaya bites",
       "video": "reels/R82_izakaya_bites.mp4",
       "caption": "Something to go with your drink 🍶\nDashimaki egg, a small otsumami plate and a vegetable tendon.\n\nსანაყრე ჩვენთან 🍶\nЗакуски к напитку 🍶\n\n💬 Beer, wine or highball? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #izakaya #otsumami #dashimaki #японскаяеда"
+    },
+    "R83": {
+      "id": "R83",
+      "title": "Ramen three ways",
+      "video": "reels/R83_ramen_three.mp4",
+      "caption": "Cold night? Ramen. 🍜\nShio, shoyu or miso — all at Japan Food Hub.\n\nრამენი 🍜\nРамен 🍜\n\n💬 Shio, shoyu or miso? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #ramen #ramentbilisi #рамен"
+    },
+    "R84": {
+      "id": "R84",
+      "title": "Curry omurice",
+      "video": "reels/R84_curry_omurice.mp4",
+      "caption": "Japanese curry meets soft omelette rice 🍛🍳\nOne spoon, both at once.\n\nკარი და ომურაისი 🍛\nКарри и омурайс 🍛\n\n📌 Save it for a hungry day\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #omurice #japanesecurry #curryrice #омурайс"
+    },
+    "R85": {
+      "id": "R85",
+      "title": "Showa classics",
+      "video": "reels/R85_showa_classics.mp4",
+      "caption": "Old-school Japanese diner food 🍝🍳\nSpaghetti Napolitan and ketchup omurice — the taste of Showa-era Japan.\n\nძველი იაპონური კლასიკა 🍝\nЯпонская классика эпохи Сёва 🍝\n\n💬 Napolitan or omurice? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #napolitan #omurice #showa #омурайс"
+    },
+    "R86": {
+      "id": "R86",
+      "title": "Georgian classics",
+      "video": "reels/R86_georgian_side.mp4",
+      "caption": "Georgia on the same table 🇬🇪\nKhinkali and khachapuri at Japan Food Hub — Japanese and Georgian, side by side.\n\nხინკალი და ხაჭაპური 🇬🇪\nХинкали и хачапури 🇬🇪\n\n💬 How many khinkali can you eat? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #khinkali #khachapuri #georgianfood #хинкали"
     }
   }
 }

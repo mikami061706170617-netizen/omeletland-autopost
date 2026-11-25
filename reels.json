@@ -86,7 +86,14 @@
     "R83",
     "R84",
     "R85",
-    "R86"
+    "R86",
+    "R91",
+    "R92",
+    "R93",
+    "R94",
+    "R95",
+    "R96",
+    "R97"
   ],
   "posts": {
     "R1": {
@@ -615,6 +622,48 @@
       "title": "Izakaya bites",
       "video": "reels/R90_izakaya_bites.mp4",
       "caption": "Something to go with your drink 🍶\nDashimaki egg, a small otsumami plate and a vegetable tendon.\n\nსანაყრე ჩვენთან 🍶\nЗакуски к напитку 🍶\n\n💬 Beer, wine or highball? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #izakaya #otsumami #dashimaki #японскаяеда"
+    },
+    "R91": {
+      "id": "R91",
+      "title": "Tomato sauce omurice",
+      "video": "reels/R91_tomato_omurice.mp4",
+      "caption": "Red sauce, soft egg 🍅🍳\nTomato sauce and basil under a fluffy omelette — four plates from our kitchen.\n\nომურაისი პომიდვრის სოუსით 🍅\nОмурайс с томатным соусом 🍅\n\n💬 Green basil or purple basil? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #omurice #tomatosauce #омурайс"
+    },
+    "R92": {
+      "id": "R92",
+      "title": "Roast beef, sushi style",
+      "video": "reels/R92_beef_sushi_board.mp4",
+      "caption": "Roast beef, sushi style 🥩🍣\nBeef nigiri, beef with onion and mayo, and two beef rolls — straight off the board.\n\nროსტბიფის სუში 🥩🍣\nСуши с ростбифом 🥩🍣\n\n💬 Nigiri or roll? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #beefsushi #roastbeef #sushitbilisi #суши"
+    },
+    "R93": {
+      "id": "R93",
+      "title": "Come find us",
+      "video": "reels/R93_come_find_us.mp4",
+      "caption": "Come find us in Saburtalo 🏮\nOmurice Land at Japan Food Hub — manga walls, paper lanterns and omurice made to order.\n\nგვესტუმრეთ საბურთალოზე 🏮\nЖдём вас на Сабуртало 🏮\n\n💬 Who are you bringing? Tag them 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #omurice #omuriceland #tbilisicafe"
+    },
+    "R94": {
+      "id": "R94",
+      "title": "Ramen, curry or omurice",
+      "video": "reels/R94_ramen_curry_omurice.mp4",
+      "caption": "Ramen, curry or omurice? 🍜🍛🍳\nOne kitchen, one menu — shio, tonkotsu and miso ramen, Japanese curry and omurice.\n\nრამენი, კარი თუ ომურაისი? 🍜\nРамен, карри или омурайс? 🍜\n\n💬 Which one tonight? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #ramen #japanesecurry #omurice #рамен"
+    },
+    "R95": {
+      "id": "R95",
+      "title": "Tbilisi from above",
+      "video": "reels/R95_tbilisi_from_above.mp4",
+      "caption": "Tbilisi from above 🌄 — then dinner in Saburtalo.\nOld Town roofs, the river and Metekhi at night.\n\nთბილისი ზემოდან 🌄\nТбилиси с высоты 🌄\n\n💬 Your favourite view in Tbilisi? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #tbilisiview #oldtbilisi #metekhi"
+    },
+    "R96": {
+      "id": "R96",
+      "title": "Lunch at the counter",
+      "video": "reels/R96_lunch_counter.mp4",
+      "caption": "Lunch at the counter 🍳\nOmurice plates lined up, a soup on the side and an omelette plate with Napolitan.\n\nლანჩი ჩვენთან 🍳\nОбед у нас 🍳\n\n💬 Soup or salad with yours? 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #lunchtbilisi #omurice #omelette #обед"
+    },
+    "R97": {
+      "id": "R97",
+      "title": "Happy hour at the Hub",
+      "video": "reels/R97_happy_hour.mp4",
+      "caption": "Happy hour at the Hub 🍻\nEvery day 15:00–18:00 — 3 snacks + 2 drinks. Georgian wine is on the list too.\n\nბედნიერი საათები 15:00–18:00 🍻\nСчастливые часы 15:00–18:00 🍻\n\n💬 Who's coming with you? Tag them 👇\n\n📍 Japan Food Hub, 1 Davit Gamrekeli St (corner of Bakhtrioni), Saburtalo\n🚇 6 min from Technical University metro · 🕚 Daily 13:00–23:00\n\n#tbilisi #tbilisifood #tbilisirestaurants #saburtalo #japanesefood #japanfoodhub #visitgeorgia #тбилиси #грузия #თბილისი #happyhour #georgianwine #tbilisibar"
     }
   }
 }
